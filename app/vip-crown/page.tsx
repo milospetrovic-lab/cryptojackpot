@@ -1,4 +1,5 @@
-import { ChipTier, TIERS } from "@/components/jackpot/ChipTier";
+import { ChipTier } from "@/components/jackpot/ChipTier";
+import { TIERS } from "@/lib/tiers";
 
 export default function VipCrownPage() {
   return (

@@ -8,7 +8,8 @@ import { DropsRow } from "@/components/jackpot/DropsRow";
 import { RollCall } from "@/components/jackpot/RollCall";
 import { FAQ } from "@/components/jackpot/FAQ";
 import { CommunitySection } from "@/components/jackpot/CommunitySection";
-import { ChipTier, TIERS } from "@/components/jackpot/ChipTier";
+import { ChipTier } from "@/components/jackpot/ChipTier";
+import { TIERS } from "@/lib/tiers";
 
 export default function Home() {
   return (
