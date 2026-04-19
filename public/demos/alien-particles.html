@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CryptoJackpot — Alien Particles</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: transparent;
+  }
+</style>
+</head>
+<body>
+<script>
+/*
+ * Adapted from Plasm.it "ALIEN" codepen.
+ * Vanilla JS port, CryptoJackpot palette: ruby #C41E3A replaces the
+ * yellow-green accent (#b5ff00), gold/charcoal anchor the rest.
+ * Trail fade uses destination-out so the body stays transparent.
+ */
+(() => {
+  const winW = () => window.innerWidth;
+  const winH = () => window.innerHeight;
+
+  const isDesktop = winW() >= 1024;
+  const max_particles = isDesktop ? 1800 : 700;
+
+  const tela = document.createElement("canvas");
+  tela.width = winW();
+  tela.height = winH();
+  Object.assign(tela.style, {
+    position: "absolute", top: "0", left: "0", width: "100%", height: "100%",
+  });
+  document.body.appendChild(tela);
+  const canvas = tela.getContext("2d");
+
+  class Particle {
+    constructor(cnvs) {
+      const random = Math.random();
+      this.progress = 0;
+      this.canvas = cnvs;
+      this.x = winW() / 2 + (Math.random() * 200 - Math.random() * 200);
+      this.y = winH() / 2 + (Math.random() * 200 - Math.random() * 200);
+      this.s = Math.random() * 1;
+      this.a = 0;
+      this.w = winW();
+      this.h = winH();
+      this.radius = random > 0.2 ? Math.random() * 1 : Math.random() * 3;
+      // base: deep gold #D4AF37  ·  accent: molten red-orange #E63946 (replaces #b5ff00)
+      this.color = random > 0.2 ? "#D4AF37" : "#E63946";
+      this.radius = random > 0.8 ? Math.random() * 2 : this.radius;
+      this.color = random > 0.8 ? "#FFD700" : this.color;
+      this.variantx1 = Math.random() * 300;
+      this.variantx2 = Math.random() * 400;
+      this.varianty1 = Math.random() * 100;
+      this.varianty2 = Math.random() * 120;
+    }
+    render() {
+      this.canvas.beginPath();
+      this.canvas.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+      this.canvas.lineWidth = 2;
+      this.canvas.fillStyle = this.color;
+      this.canvas.fill();
+      this.canvas.closePath();
+    }
+    move() {
+      this.x += Math.cos(this.a) * this.s;
+      this.y += Math.sin(this.a) * this.s;
+      this.a += Math.random() * 0.8 - 0.4;
+      if (this.x < 0 || this.x > this.w - this.radius) return false;
+      if (this.y < 0 || this.y > this.h - this.radius) return false;
+      this.render();
+      this.progress++;
+      return true;
+    }
+  }
+
+  let particles = [];
+  function popolate(num) {
+    for (let i = 0; i < num; i++) {
+      setTimeout(() => particles.push(new Particle(canvas)), i * 20);
+    }
+    return particles.length;
+  }
+  const init_num = popolate(max_particles);
+
+  function clear() {
+    canvas.globalCompositeOperation = "destination-out";
+    canvas.globalAlpha = 0.06;
+    canvas.fillStyle = "#000";
+    canvas.fillRect(0, 0, tela.width, tela.height);
+    canvas.globalAlpha = 1;
+    canvas.globalCompositeOperation = "source-over";
+  }
+
+  function update() {
+    particles = particles.filter((p) => p.move());
+    if (particles.length < init_num) popolate(1);
+    clear();
+    requestAnimationFrame(update);
+  }
+
+  window.addEventListener("resize", () => {
+    tela.width = winW();
+    tela.height = winH();
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>

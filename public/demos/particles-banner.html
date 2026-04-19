@@ -44,7 +44,10 @@
 <script>
   particlesJS("particles-js", {
     particles: {
-      number: { value: 120, density: { enable: true, value_area: 900 } },
+      number: {
+        value: window.innerWidth >= 1024 ? 220 : 90,
+        density: { enable: true, value_area: 900 }
+      },
       color: { value: ["#FFD700", "#D4AF37", "#C41E3A", "#E63946"] },
       shape: {
         type: "circle",

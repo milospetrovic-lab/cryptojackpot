@@ -22,8 +22,9 @@
  */
 (() => {
   const BG = "#0A0A0C";
-  const max_particles = 2200;
-  const frequency = 10;
+  const isDesktop = window.innerWidth >= 1024;
+  const max_particles = isDesktop ? 4200 : 1800;
+  const frequency = isDesktop ? 6 : 14;
   const max_time = frequency * max_particles;
   const particles = [];
   let time_to_recreate = false;

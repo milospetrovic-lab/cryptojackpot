@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The House Curated — Stage Comparator</title>
+<style>
+@property --scroll-progress { inherits: true; initial-value: 0; syntax: "<number>"; }
+@property --layer-index { syntax: "<integer>"; inherits: true; initial-value: 1; }
+@property --layer-count { syntax: "<integer>"; inherits: true; initial-value: 1; }
+@property --divider-index { syntax: "<integer>"; inherits: true; initial-value: 1; }
+@property --divider-count { syntax: "<integer>"; inherits: true; initial-value: 1; }
+
+@layer reset, base, typography, layout, comparator, navigation, links;
+
+@layer reset {
+  *, *::after, *::before { box-sizing: border-box; margin: 0; padding: 0; }
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-y: scroll;
+    background: #000;
+  }
+}
+
+@layer base {
+  :root {
+    --color-light: #FFE88A;
+    --color-dark: #0A0A0C;
+    --color-light-lighter: #FFF5C0;
+    --color-light-darker: #D4AF37;
+    --color-dark-lighter: #1A1A1D;
+    --color-dark-darker: #000000;
+    --color-bg: var(--color-dark);
+    --color-bg-alt: var(--color-dark-lighter);
+    --color-text: var(--color-light);
+    --color-text-muted: #A0A0A6;
+    --color-accent: #FFD700;
+
+    --support-message-bg: var(--color-dark-darker);
+    --support-message-text: var(--color-light-lighter);
+
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-xxl: 3rem;
+    --line-tight: 1.2;
+    --line-base: 1.5;
+    --line-loose: 1.75;
+    --font-sans: "Manrope", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --font-display: "Cinzel", serif;
+    --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    --ts-xxs: clamp(0.75rem, -4cqw + 0.35rem, 0.9rem);
+    --ts-xs: clamp(0.81rem, -3cqw + 0.35rem, 1.035rem);
+    --ts-sm: clamp(0.9113rem, -1.5cqw + 0.35rem, 1.1644rem);
+    --ts-base: clamp(1rem, 0cqw + 0.35rem, 1.1rem);
+    --ts-md: clamp(1.1rem, 1.5cqw + 0.35rem, 1.4rem);
+    --ts-lg: clamp(1.25rem, 3cqw + 0.35rem, 1.6rem);
+    --ts-xl: clamp(1.5rem, 6cqw + 0.35rem, 2rem);
+    --ts-xxl: clamp(1.9rem, 9cqw + 0.35rem, 2.5rem);
+    --ts-xxxl: clamp(2.25rem, 12cqw + 0.35rem, 3.1rem);
+
+    --comparator-duration: 400vh;
+    --comparator-offset: 35vh;
+    --comparator-max-width: 56.25rem;
+    --comparator-max-height: 100vh;
+    --comparator-aspect-ratio: 4/3;
+
+    accent-color: var(--color-accent);
+  }
+
+  @media (max-width: 48em) {
+    :root { --comparator-aspect-ratio: 3/4; }
+  }
+
+  ::selection { background: var(--color-accent); color: var(--color-dark); }
+
+  body {
+    background: #0A0A0C;
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--ts-base);
+    -webkit-font-smoothing: antialiased;
+    line-height: var(--line-base);
+    min-block-size: 100vh;
+    padding-block-start: var(--space-xl);
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer typography {
+  :where(section, article) > * + * { margin-block-start: var(--space-lg); }
+
+  :is(h1, h2, h3, h4, h5, h6) {
+    font-weight: 700;
+    font-family: var(--font-display);
+    letter-spacing: 0.14em;
+    line-height: var(--line-tight);
+    text-transform: uppercase;
+  }
+
+  h1 {
+    font-size: var(--ts-xxxl);
+    margin-block-end: var(--space-lg);
+    background: linear-gradient(180deg, #FFE88A 0%, #FFD700 45%, #D4AF37 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  p {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    hyphens: auto;
+    letter-spacing: 0;
+    line-height: var(--line-loose);
+    text-wrap: pretty;
+    color: #A0A0A6;
+  }
+
+  code {
+    background: var(--color-bg-alt);
+    border-radius: 0.25em;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    padding: 0.125em 0.25em;
+  }
+
+  a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 0.2em; }
+  small { font-size: var(--ts-sm); color: #5A5A60; }
+}
+
+@layer layout {
+  @supports not ((animation-timeline: scroll()) and (z-index: sibling-count())) {
+    .intro::before {
+      background: var(--support-message-bg);
+      border: 1px solid var(--color-accent);
+      border-radius: 0.5rem;
+      color: var(--support-message-text);
+      content: "This effect relies on scroll-driven CSS animations (Chrome or Edge 115+). On other browsers the stages will stack.";
+      display: block;
+      font-size: var(--ts-base);
+      font-weight: 600;
+      margin-block: var(--space-xl);
+      padding: var(--space-md);
+    }
+  }
+
+  .intro {
+    display: block;
+    inline-size: calc(100% - var(--space-xl));
+    margin: 0 auto;
+    max-inline-size: 56.25rem;
+    padding-block-end: var(--space-xxl);
+    text-align: center;
+  }
+
+  .scroll-section {
+    block-size: calc(var(--comparator-duration) + 100vh);
+    position: relative;
+  }
+
+  .spacer { block-size: 40vh; }
+
+  .scroll-indicator {
+    font-family: var(--font-mono);
+    font-size: var(--ts-sm);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    opacity: 0.75;
+    text-align: center;
+  }
+}
+
+@layer comparator {
+  .comparator-container {
+    align-items: center;
+    block-size: 100vh;
+    display: flex;
+    inset-block-start: 0;
+    justify-content: center;
+    overflow: hidden;
+    position: sticky;
+  }
+
+  .comparator-wrapper {
+    animation: comparator-3d-flip linear both;
+    animation-range: calc(var(--comparator-offset) - 50vh)
+      calc(var(--comparator-offset) + var(--comparator-duration) + 50vh);
+    animation-timeline: scroll(root);
+    aspect-ratio: var(--comparator-aspect-ratio);
+    border-radius: 0.75rem;
+    inline-size: 100%;
+    margin-inline: var(--space-md);
+    max-block-size: var(--comparator-max-height);
+    max-inline-size: var(--comparator-max-width);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 90px -20px rgba(0, 0, 0, 0.9),
+      0 0 0 1px rgba(212, 175, 55, 0.25) inset;
+  }
+
+  .comparator-wrapper.flip-reverse { animation-name: comparator-3d-flip-reverse; }
+
+  .comparator {
+    animation: progress-calc linear both;
+    animation-range: var(--comparator-offset)
+      calc(var(--comparator-offset) + var(--comparator-duration));
+    animation-timeline: scroll(root);
+    block-size: 100%;
+    display: grid;
+    inline-size: 100%;
+    position: relative;
+  }
+
+  .image-layers, .divider-lines {
+    grid-area: 1 / -1;
+    display: grid;
+    position: relative;
+  }
+
+  .image-layer {
+    display: grid;
+    grid-area: 1 / -1;
+    position: relative;
+    z-index: calc(sibling-count() - sibling-index() + 1);
+  }
+
+  .image-layer:not(:last-child) {
+    --layer-index: sibling-index();
+    --layer-count: sibling-count();
+    --layer-start: calc((var(--layer-index) - 1) / (var(--layer-count) - 1));
+    --layer-end: calc(var(--layer-index) / (var(--layer-count) - 1));
+
+    animation: clip-reveal linear both;
+    animation-timeline: scroll(root);
+    animation-range: calc(
+        var(--comparator-offset) + (var(--comparator-duration) * var(--layer-start))
+      )
+      calc(
+        var(--comparator-offset) + (var(--comparator-duration) * var(--layer-end))
+      );
+  }
+
+  picture {
+    grid-area: 1 / -1;
+    max-block-size: var(--comparator-max-height);
+    inline-size: 100%; block-size: 100%;
+    display: block;
+  }
+
+  .image-layer img {
+    block-size: 100%;
+    display: block;
+    inline-size: 100%;
+    object-fit: cover;
+    object-position: center;
+    aspect-ratio: var(--comparator-aspect-ratio);
+    background: #1A1A1D;
+    filter: saturate(1.05) contrast(1.05);
+  }
+
+  .divider-line {
+    --divider-index: sibling-index();
+    --divider-count: sibling-count();
+    --layer-start: calc((var(--divider-index) - 1) / var(--divider-count));
+    --layer-end: calc(var(--divider-index) / var(--divider-count));
+
+    background: transparent;
+    block-size: 100%;
+    border-inline-start: thin solid #FFD700;
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.65);
+    grid-area: 1 / -1;
+    inline-size: 1px;
+    pointer-events: none;
+    position: relative;
+    z-index: calc(20 - var(--divider-index));
+
+    animation: divider-move linear both;
+    animation-timeline: scroll(root);
+    animation-range: calc(
+        var(--comparator-offset) + (var(--comparator-duration) * var(--layer-start))
+      )
+      calc(
+        var(--comparator-offset) + (var(--comparator-duration) * var(--layer-end))
+      );
+  }
+
+  .comparator-overlay {
+    block-size: 100%;
+    display: flex;
+    flex-direction: column;
+    grid-area: 1 / -1;
+    inline-size: 100%;
+    max-block-size: var(--comparator-max-height);
+    position: relative;
+    transform: translateZ(30px);
+  }
+
+  .label {
+    backdrop-filter: blur(0.375rem);
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    border-radius: 999px;
+    color: #FFD700;
+    font-family: var(--font-mono);
+    font-size: var(--ts-xxs);
+    font-weight: 600;
+    inline-size: fit-content;
+    letter-spacing: 0.25em;
+    margin-block: var(--space-md) auto;
+    margin-inline: var(--space-md) auto;
+    padding: 0.4rem 0.9rem;
+    pointer-events: none;
+    position: relative;
+    text-transform: uppercase;
+    white-space: nowrap;
+    z-index: 11;
+  }
+
+  .image-text {
+    animation: text-reveal 0.6s ease-out both;
+    animation-range: var(--comparator-offset)
+      calc(var(--comparator-offset) + 20vh);
+    animation-timeline: scroll(root);
+    margin-block: auto var(--space-md);
+    margin-inline: var(--space-md) auto;
+    pointer-events: none;
+    position: relative;
+    z-index: 10;
+  }
+
+  .image-text h2 {
+    font-family: var(--font-display);
+    font-size: var(--ts-xl);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1.1;
+    margin: 0;
+    color: #FFE88A;
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.8);
+  }
+
+  .image-text h3 {
+    font-family: var(--font-sans);
+    font-size: var(--ts-md);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    margin-top: 0.4rem;
+    color: #D4AF37;
+    text-transform: uppercase;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
+  }
+
+  .comparison-percentage {
+    color: #FFD700;
+    bottom: var(--space-md);
+    font-family: var(--font-mono);
+    font-size: var(--ts-md);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    line-height: 1.4;
+    pointer-events: none;
+    position: absolute;
+    right: var(--space-md);
+    z-index: 20;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
+  }
+
+  @keyframes comparator-3d-flip {
+    0% {
+      opacity: 0.75;
+      transform: perspective(1200px) rotateX(10deg) rotateY(-10deg) rotateZ(-3deg) scale(0.85);
+    }
+    15%, 85% {
+      opacity: 1;
+      transform: perspective(1200px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+    }
+    100% {
+      opacity: 0.75;
+      transform: perspective(1200px) rotateX(-10deg) rotateY(10deg) rotateZ(3deg) scale(0.85);
+    }
+  }
+  @keyframes comparator-3d-flip-reverse {
+    0% {
+      opacity: 0.75;
+      transform: perspective(1200px) rotateX(-10deg) rotateY(10deg) rotateZ(3deg) scale(0.85);
+    }
+    15%, 85% {
+      opacity: 1;
+      transform: perspective(1200px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+    }
+    100% {
+      opacity: 0.75;
+      transform: perspective(1200px) rotateX(10deg) rotateY(-10deg) rotateZ(-3deg) scale(0.85);
+    }
+  }
+  @keyframes progress-calc {
+    from { --scroll-progress: 0; }
+    to { --scroll-progress: 100; }
+  }
+  @keyframes clip-reveal {
+    from { clip-path: inset(0 0 0 0); }
+    to { clip-path: inset(0 100% 0 0); }
+  }
+  @keyframes divider-move {
+    0% { inset-inline-start: 100%; opacity: 0; }
+    2% { opacity: 1; }
+    98% { opacity: 1; }
+    100% { inset-inline-start: 0%; opacity: 0; }
+  }
+  @keyframes text-reveal {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@layer navigation {
+  .stage-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: absolute;
+    right: var(--space-md);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 25;
+    pointer-events: auto;
+  }
+
+  .stage-indicator {
+    appearance: none;
+    background: rgba(255, 215, 0, 0.28);
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    height: 0.5rem;
+    padding: 0;
+    transition: all 0.2s ease;
+    width: 0.5rem;
+  }
+  .stage-indicator:hover { background: rgba(255, 215, 0, 0.7); transform: scale(1.3); }
+  .stage-indicator.active { background: #FFD700; height: 1rem; }
+  .stage-indicator:focus-visible { outline: 2px solid #FFD700; outline-offset: 2px; }
+
+  @media (max-width: 48em) {
+    .stage-nav {
+      flex-direction: row;
+      right: 50%;
+      top: auto;
+      bottom: calc(var(--space-md) * 3);
+      transform: translateX(50%);
+    }
+    .stage-indicator.active { height: 0.5rem; width: 1rem; }
+  }
+}
+</style>
+</head>
+<body>
+<main>
+  <article>
+    <section class="intro">
+      <p>
+        Four stages of the reel, from quiet to ring. Scroll to drive each
+        reveal — the divider moves with your scroll, the stage count ticks
+        in the corner, and the card pivots on its 3D axis as it enters and
+        leaves the viewport.
+      </p>
+    </section>
+    <section><p class="scroll-indicator">Scroll down ↓</p></section>
+    <section class="scroll-section">
+      <div class="comparator-container">
+        <div class="comparator-wrapper">
+          <div class="comparator">
+            <div class="comparison-percentage"></div>
+            <div class="image-layers">
+              <div class="image-layer">
+                <picture>
+                  <source media="(max-width: 48em)" srcset="https://assets.codepen.io/573855/lr-scroll-img-01-820x1093.webp">
+                  <img src="https://assets.codepen.io/573855/lr-scroll-img-01-1024x768.webp" decoding="async" fetchpriority="high" alt="Stage 1">
+                </picture>
+                <div class="comparator-overlay">
+                  <span class="label">Stage 1</span>
+                  <div class="image-text">
+                    <h2>Quiet Stake</h2>
+                    <h3>— The first chip lands</h3>
+                  </div>
+                </div>
+              </div>
+              <div class="image-layer">
+                <picture>
+                  <source media="(max-width: 48em)" srcset="https://assets.codepen.io/573855/lr-scroll-img-02-820x1093.webp">
+                  <img src="https://assets.codepen.io/573855/lr-scroll-img-02-1024x768.webp" decoding="async" fetchpriority="high" alt="Stage 2">
+                </picture>
+                <div class="comparator-overlay">
+                  <span class="label">Stage 2</span>
+                  <div class="image-text">
+                    <h2>Reels Climb</h2>
+                    <h3>— Pressure in the chamber</h3>
+                  </div>
+                </div>
+              </div>
+              <div class="image-layer">
+                <picture>
+                  <source media="(max-width: 48em)" srcset="https://assets.codepen.io/573855/lr-scroll-img-03-820x1093.webp">
+                  <img src="https://assets.codepen.io/573855/lr-scroll-img-03-1024x768.webp" decoding="async" fetchpriority="high" alt="Stage 3">
+                </picture>
+                <div class="comparator-overlay">
+                  <span class="label">Stage 3</span>
+                  <div class="image-text">
+                    <h2>Near Miss</h2>
+                    <h3>— One symbol short</h3>
+                  </div>
+                </div>
+              </div>
+              <div class="image-layer">
+                <picture>
+                  <source media="(max-width: 48em)" srcset="https://assets.codepen.io/573855/lr-scroll-img-04-820x1093.webp">
+                  <img src="https://assets.codepen.io/573855/lr-scroll-img-04-1024x768.webp" decoding="async" fetchpriority="high" alt="Stage 4">
+                </picture>
+                <div class="comparator-overlay">
+                  <span class="label">Stage 4</span>
+                  <div class="image-text">
+                    <h2>Vault Rings</h2>
+                    <h3>— The Hit lands</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="divider-lines">
+              <div class="divider-line"></div>
+              <div class="divider-line"></div>
+              <div class="divider-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section><p class="scroll-indicator">Scroll down ↓</p></section>
+    <section class="scroll-section">
+      <div class="comparator-container">
+        <div class="comparator-wrapper flip-reverse">
+          <div class="comparator">
+            <div class="comparison-percentage"></div>
+            <div class="image-layers">
+              <div class="image-layer">
+                <picture>
+                  <source media="(max-width: 48em)" srcset="https://assets.codepen.io/573855/lr-scroll-img-05-820x1093.webp">
+                  <img src="https://assets.codepen.io/573855/lr-scroll-img-05-1024x768.webp" decoding="async" loading="lazy" alt="Stage 1">
+                </picture>
+                <div class="comparator-overlay">
+                  <span class="label">Stage 1</span>
+                  <div class="image-text">
+                    <h2>Empty Floor</h2>
+                    <h3>— The lounge at open</h3>
+                  </div>
+                </div>
+              </div>
+              <div class="image-layer">
+                <picture>
+                  <source media="(max-width: 48em)" srcset="https://assets.codepen.io/573855/lr-scroll-img-06-820x1093.webp">
+                  <img src="https://assets.codepen.io/573855/lr-scroll-img-06-1024x768.webp" decoding="async" loading="lazy" alt="Stage 2">
+                </picture>
+                <div class="comparator-overlay">
+                  <span class="label">Stage 2</span>
+                  <div class="image-text">
+                    <h2>Tables Fill</h2>
+                    <h3>— The seats warm up</h3>
+                  </div>
+                </div>
+              </div>
+              <div class="image-layer">
+                <picture>
+                  <source media="(max-width: 48em)" srcset="https://assets.codepen.io/573855/lr-scroll-img-07-820x1093.webp">
+                  <img src="https://assets.codepen.io/573855/lr-scroll-img-07-1024x768.webp" decoding="async" loading="lazy" alt="Stage 3">
+                </picture>
+                <div class="comparator-overlay">
+                  <span class="label">Stage 3</span>
+                  <div class="image-text">
+                    <h2>Showdown</h2>
+                    <h3>— The Friday Roll Call</h3>
+                  </div>
+                </div>
+              </div>
+              <div class="image-layer">
+                <picture>
+                  <source media="(max-width: 48em)" srcset="https://assets.codepen.io/573855/lr-scroll-img-08-820x1093.webp">
+                  <img src="https://assets.codepen.io/573855/lr-scroll-img-08-1024x768.webp" decoding="async" loading="lazy" alt="Stage 4">
+                </picture>
+                <div class="comparator-overlay">
+                  <span class="label">Stage 4</span>
+                  <div class="image-text">
+                    <h2>Last Spin</h2>
+                    <h3>— The chamber falls quiet</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="divider-lines">
+              <div class="divider-line"></div>
+              <div class="divider-line"></div>
+              <div class="divider-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section><p class="scroll-indicator">Scroll up ↑</p></section>
+    <section class="spacer"></section>
+  </article>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  let velocity = 0;
+  const ease = 0.12;
+  const friction = 0.92;
+  const sections = document.querySelectorAll(".scroll-section");
+  const sectionsLen = sections.length;
+  const wrappers = [];
+  const comparatorData = [];
+  let i, s, w, c, p;
+
+  for (i = 0; i < sectionsLen; i++) {
+    s = sections[i];
+    w = s.querySelector(".comparator-wrapper");
+    if (w) wrappers.push({ section: s, wrapper: w });
+    c = s.querySelector(".comparator");
+    if (!c) continue;
+    p = c.querySelector(".comparison-percentage");
+    if (p) {
+      const layers = c.querySelectorAll(".image-layer");
+      comparatorData.push({
+        comp: c, pct: p, section: s,
+        layerCount: layers.length, wrapper: w
+      });
+    }
+  }
+
+  const wrappersLen = wrappers.length;
+  const compLen = comparatorData.length;
+  let d, v;
+
+  function createStageIndicators() {
+    for (i = 0; i < compLen; i++) {
+      d = comparatorData[i];
+      const nav = document.createElement("div");
+      nav.className = "stage-nav";
+      const indicators = [];
+      for (let j = 0; j < d.layerCount; j++) {
+        const indicator = document.createElement("button");
+        indicator.className = "stage-indicator";
+        indicator.setAttribute("aria-label", "Go to stage " + (j + 1));
+        indicator.dataset.stage = j;
+        indicator.dataset.comparatorIndex = i;
+        indicators.push(indicator);
+        nav.appendChild(indicator);
+      }
+      d.comp.appendChild(nav);
+      d.indicators = indicators;
+    }
+  }
+
+  function getComparatorDuration() {
+    const style = getComputedStyle(document.documentElement);
+    const duration = style.getPropertyValue("--comparator-duration").trim();
+    return (parseFloat(duration) * window.innerHeight) / 100;
+  }
+
+  let targetScrollPosition = null;
+  const scrollEase = 0.08;
+
+  function scrollToStage(comparatorIndex, stageIndex) {
+    const data = comparatorData[comparatorIndex];
+    if (!data) return;
+    const offset = data.section.offsetTop;
+    const duration = getComparatorDuration();
+    const stageCount = data.layerCount;
+    stageIndex = Math.max(0, Math.min(stageIndex, stageCount - 1));
+    const stageDuration = duration / (stageCount - 1);
+    targetScrollPosition = offset + stageDuration * stageIndex;
+  }
+
+  function onIndicatorClick(e) {
+    const btn = e.target.closest(".stage-indicator");
+    if (!btn) return;
+    const stage = parseInt(btn.dataset.stage, 10);
+    const compIndex = parseInt(btn.dataset.comparatorIndex, 10);
+    scrollToStage(compIndex, stage);
+  }
+
+  function updateOffsets() {
+    for (i = 0; i < wrappersLen; i++) {
+      w = wrappers[i];
+      w.wrapper.style.setProperty("--comparator-offset", w.section.offsetTop + "px");
+    }
+  }
+
+  function onWheel(e) {
+    e.preventDefault();
+    targetScrollPosition = null;
+    velocity += e.deltaY;
+  }
+
+  let resizeTimeout;
+  function onResize() {
+    targetScrollPosition = null;
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => { updateOffsets(); }, 150);
+  }
+
+  function onMouseDown(e) {
+    if (!e.target.closest(".comparator-wrapper")) targetScrollPosition = null;
+  }
+
+  function frame() {
+    if (targetScrollPosition !== null) {
+      const current = window.scrollY;
+      const delta = targetScrollPosition - current;
+      if (Math.abs(delta) > 1) {
+        window.scrollBy(0, delta * scrollEase);
+      } else {
+        targetScrollPosition = null;
+      }
+    }
+    velocity *= friction;
+    if (velocity > 0.2 || velocity < -0.2) window.scrollBy(0, velocity * ease);
+
+    for (i = 0; i < compLen; i++) {
+      d = comparatorData[i];
+      v = parseFloat(getComputedStyle(d.comp).getPropertyValue("--scroll-progress")) || 0;
+      d.pct.textContent = (Math.round(v) + "").padStart(2, "0") + "%";
+      const currentStage = Math.round((v / 100) * (d.layerCount - 1));
+      d.indicators.forEach((indicator, idx) => {
+        indicator.classList.toggle("active", idx === currentStage);
+      });
+    }
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener("wheel", onWheel, { passive: false });
+  window.addEventListener("resize", onResize, { passive: true });
+  window.addEventListener("mousedown", onMouseDown, { passive: true });
+  document.addEventListener("click", onIndicatorClick);
+
+  window.addEventListener("load", () => {
+    createStageIndicators();
+    updateOffsets();
+    requestAnimationFrame(frame);
+  });
+})();
+</script>
+</body>
+</html>

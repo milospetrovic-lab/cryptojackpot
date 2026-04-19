@@ -27,7 +27,8 @@
 (() => {
   const TEXT = "CRYPTOJACKPOT";
   const particles = [];
-  const frequency = 18;
+  const isDesktop = window.innerWidth >= 1024;
+  const frequency = isDesktop ? 8 : 16;
 
   const winW = () => window.innerWidth;
   const winH = () => window.innerHeight;

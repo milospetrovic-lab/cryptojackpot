@@ -1,4 +1,5 @@
 import { CommunitySection } from "@/components/jackpot/CommunitySection";
+import { CommunityBackdrop } from "@/components/layout/CommunityBackdrop";
 
 const HITS = [
   { handle: "Sha****", amount: "₿8.42", game: "Molten Gold Deluxe", time: "3m" },
@@ -11,7 +12,8 @@ const HITS = [
 export default function CommunityPage() {
   return (
     <div className="relative mx-auto max-w-5xl px-8 pt-32 pb-20">
-      <header className="mb-6 text-center">
+      <CommunityBackdrop />
+      <header className="relative z-10 mb-6 text-center">
         <div className="eyebrow">The Lounge After Hours</div>
         <h1 className="display mt-4 text-[clamp(42px,7vw,84px)] text-jp-white tracking-[0.14em]">
           <span className="gold-text">Community</span>

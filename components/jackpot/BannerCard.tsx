@@ -1,26 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 /**
  * BannerCard — full-width landing banner.
  * Layer 1: user-supplied banner PNG (3D crypto sign render).
  * Layer 2: particles.js (Vincent Garreau) iframe, transparent, gold + ruby.
+ *          Count auto-scales by viewport in the HTML.
  * Layer 3: copy + CTA.
  */
 export function BannerCard() {
   const { ref, inView } = useInView({ triggerOnce: true, rootMargin: "120px" });
-  const [mobile, setMobile] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 768px)");
-    const sync = () => setMobile(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
 
   return (
     <section className="relative mx-auto max-w-6xl px-6 py-14">
@@ -48,7 +39,7 @@ export function BannerCard() {
         />
 
         {/* Layer 2 — particles.js iframe (transparent) */}
-        {inView && !mobile && (
+        {inView && (
           <iframe
             src="/demos/particles-banner.html"
             loading="lazy"

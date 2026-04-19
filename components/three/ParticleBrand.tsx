@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { cn } from "@/lib/utils";
 
@@ -8,19 +7,10 @@ type Props = { className?: string };
 
 export function ParticleBrand({ className }: Props) {
   const { ref, inView } = useInView({ triggerOnce: true, rootMargin: "100px" });
-  const [mobile, setMobile] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 768px)");
-    const sync = () => setMobile(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
 
   return (
     <div ref={ref} className={cn("relative h-full w-full", className)}>
-      {inView && !mobile ? (
+      {inView ? (
         <iframe
           src="/demos/particle-text.html"
           loading="lazy"

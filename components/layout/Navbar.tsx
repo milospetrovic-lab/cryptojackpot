@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { LogoMark } from "@/components/layout/LogoMark";
 
 const NAV_LINKS = [
   { href: "/games", label: "Games" },
@@ -45,7 +46,8 @@ export function Navbar() {
             <span className="grid h-8 w-8 place-items-center rounded-full border border-jp-gold-deep bg-gradient-to-b from-jp-gold-pale via-jp-gold to-jp-gold-deep font-display text-[12px] font-bold text-jp-obsidian tracking-[0.08em]">
               CJ
             </span>
-            <span className="display text-[13px] text-jp-gold tracking-[0.32em]">
+            <LogoMark width={190} height={26} className="hidden sm:inline-block" />
+            <span className="display text-[13px] text-jp-gold tracking-[0.32em] sm:hidden">
               cryptojackpot
             </span>
           </Link>

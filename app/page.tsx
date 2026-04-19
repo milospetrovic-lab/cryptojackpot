@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { MagnetoField } from "@/components/three/MagnetoField";
-import { ParticleBrand } from "@/components/three/ParticleBrand";
 import { VaultCounter } from "@/components/jackpot/VaultCounter";
 import { PromoBanner } from "@/components/jackpot/PromoBanner";
 import { ChipCascade } from "@/components/three/ChipCascade";
@@ -24,18 +23,18 @@ export default function Home() {
 
         {/* layer 2 — content */}
         <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-6 pt-36 pb-20 text-center">
-          <div className="eyebrow mb-6">The Vulcan VIP Casino</div>
+          <div className="eyebrow mb-4">The Vulcan VIP Casino</div>
 
-          {/* Particle-written brand headline — generous band so the word fits */}
-          <div className="relative flex h-[clamp(220px,38vh,420px)] w-full items-center justify-center">
-            <ParticleBrand />
-          </div>
+          {/* Static brand headline — particle-write effect now lives in the navbar logo */}
+          <h1 className="display gold-text select-none text-center leading-[0.95] tracking-[0.08em] text-[clamp(3rem,10vw,7rem)]">
+            CRYPTOJACKPOT
+          </h1>
 
-          {/* Hero coin — lifted ~80px so it tucks under the text */}
+          {/* Hero coin — tucked right under h1 */}
           <img
             src="/images/hero/center-coin-hero.png"
             alt="CryptoJackpot coin"
-            className="pointer-events-none -mt-20 mb-6 h-[clamp(110px,16vh,190px)] w-auto select-none object-contain drop-shadow-[0_0_60px_rgba(255,215,0,0.4)]"
+            className="pointer-events-none -mt-6 mb-4 h-[clamp(120px,18vh,220px)] w-auto select-none object-contain drop-shadow-[0_0_60px_rgba(255,215,0,0.45)]"
             draggable={false}
           />
 

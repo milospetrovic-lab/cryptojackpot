@@ -1,10 +1,11 @@
 import { ChipTier } from "@/components/jackpot/ChipTier";
 import { TIERS } from "@/lib/tiers";
+import { VaultCounter } from "@/components/jackpot/VaultCounter";
 
 export default function VipCrownPage() {
   return (
     <div className="relative mx-auto max-w-5xl px-8 pt-32 pb-24">
-      <header className="mb-16 text-center">
+      <header className="mb-12 text-center">
         <div className="eyebrow">The Progression</div>
         <h1 className="display mt-4 text-[clamp(44px,7vw,88px)] text-jp-white tracking-[0.14em]">
           <span className="gold-text">Crown Tiers</span>
@@ -15,6 +16,21 @@ export default function VipCrownPage() {
           invitation.
         </p>
       </header>
+
+      {/* Descend — small live Vault counter, flanked by rule lines */}
+      <div className="mb-16 flex flex-col items-center">
+        <div className="flex items-center gap-4">
+          <span className="h-px w-12 bg-jp-gold-deep/50 md:w-24" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-jp-gold">
+            Descend
+          </span>
+          <span className="h-px w-12 bg-jp-gold-deep/50 md:w-24" />
+        </div>
+        <VaultCounter variant="sticky" className="mt-5" />
+        <span className="mt-4 text-[10px] uppercase tracking-[0.3em] text-jp-dim">
+          The Vault · Live · ≈ USD converted at close of day
+        </span>
+      </div>
 
       <div className="space-y-14">
         {TIERS.map((tier, i) => (
