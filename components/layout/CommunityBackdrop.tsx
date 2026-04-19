@@ -11,12 +11,12 @@ export function CommunityBackdrop() {
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
       <iframe
-        src="/demos/alien-particles.html"
+        src="/demos/electric-field.html"
         loading="lazy"
         allowTransparency
         className="absolute inset-0 h-full w-full"
         style={{ border: 0, background: "transparent" }}
-        title="Community particle backdrop"
+        title="Community electric backdrop"
       />
       {/* Vignette to keep content legible on top */}
       <div

@@ -125,8 +125,17 @@ export function HouseCube() {
     if (!ctx) return;
 
     const isDesktop = window.innerWidth >= 1024;
-    const NODES = isDesktop ? 32 : 14;
-    const MAX_LINK = isDesktop ? 320 : 220;
+    // Many small dots, slow bolts — matches the hero field.
+    const NODES = isDesktop ? 34 : 16;
+    const MAX_LINK = isDesktop ? 220 : 180;
+    const BOLT_BASE_PROB = 0.006;
+    const BOLT_PROX_BONUS = 0.04;
+    const PALETTE_BOLT = [
+      "rgba(125, 216, 205, 0.88)",
+      "rgba(224, 255, 87, 0.9)",
+      "rgba(246, 136, 56, 0.88)",
+    ];
+    const PALETTE_DOT = ["#7DD8CD", "#E0FF57", "#F68838"];
     let raf = 0;
 
     function fit() {
@@ -141,9 +150,10 @@ export function HouseCube() {
     const nodes = Array.from({ length: NODES }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.35,
-      vy: (Math.random() - 0.5) * 0.35,
+      vx: (Math.random() - 0.5) * 0.18,
+      vy: (Math.random() - 0.5) * 0.18,
       seed: Math.random() * Math.PI * 2,
+      color: Math.floor(Math.random() * 3), // palette index
     }));
 
     function bolt(
@@ -181,25 +191,26 @@ export function HouseCube() {
 
     function frame() {
       ctx!.globalCompositeOperation = "destination-out";
-      ctx!.globalAlpha = 0.18;
+      ctx!.globalAlpha = 0.16;
       ctx!.fillStyle = "#000";
       ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
       ctx!.globalAlpha = 1;
       ctx!.globalCompositeOperation = "source-over";
 
       for (const n of nodes) {
-        n.x += n.vx + Math.cos((n.seed += 0.01)) * 0.15;
-        n.y += n.vy + Math.sin(n.seed * 1.3) * 0.15;
+        n.x += n.vx + Math.cos((n.seed += 0.005)) * 0.08;
+        n.y += n.vy + Math.sin(n.seed * 1.3) * 0.08;
         if (n.x < 0 || n.x > canvas!.width) n.vx *= -1;
         if (n.y < 0 || n.y > canvas!.height) n.vy *= -1;
       }
 
-      ctx!.shadowBlur = 10;
+      ctx!.shadowBlur = 8;
       for (const n of nodes) {
-        ctx!.shadowColor = "#E0FF57";
-        ctx!.fillStyle = "#E0FF57";
+        const c = PALETTE_DOT[n.color];
+        ctx!.shadowColor = c;
+        ctx!.fillStyle = c;
         ctx!.beginPath();
-        ctx!.arc(n.x, n.y, 1.6, 0, Math.PI * 2);
+        ctx!.arc(n.x, n.y, 1.2, 0, Math.PI * 2);
         ctx!.fill();
       }
       ctx!.shadowBlur = 0;
@@ -210,14 +221,11 @@ export function HouseCube() {
           const dy = nodes[i].y - nodes[j].y;
           const d = Math.hypot(dx, dy);
           if (d > MAX_LINK) continue;
-          if (Math.random() > 0.03 + (1 - d / MAX_LINK) * 0.12) continue;
-          const color =
-            Math.random() > 0.75
-              ? "rgba(196, 30, 58, 0.85)"
-              : "rgba(224, 255, 87, 0.85)";
+          if (Math.random() > BOLT_BASE_PROB + (1 - d / MAX_LINK) * BOLT_PROX_BONUS) continue;
+          const color = PALETTE_BOLT[Math.floor(Math.random() * PALETTE_BOLT.length)];
           ctx!.shadowColor = color;
           ctx!.shadowBlur = 14;
-          bolt(nodes[i].x, nodes[i].y, nodes[j].x, nodes[j].y, 4, color);
+          bolt(nodes[i].x, nodes[i].y, nodes[j].x, nodes[j].y, 3, color);
           ctx!.shadowBlur = 0;
         }
       }
@@ -330,12 +338,20 @@ export function HouseCube() {
 
   return (
     <div ref={rootRef} className="hc-root relative">
-      {/* Electric particle canvas — fixed behind the cube */}
+      {/* Electric particle canvas — concentrated in the center where the cube
+          sits. Radial mask fades the field out toward the edges so it reads
+          as lightning trapped inside the cube rather than wallpaper. */}
       <canvas
         ref={canvasRef}
         aria-hidden
         className="pointer-events-none fixed inset-0 z-[1]"
-        style={{ mixBlendMode: "screen" }}
+        style={{
+          mixBlendMode: "screen",
+          maskImage:
+            "radial-gradient(closest-side at 50% 50%, #000 40%, rgba(0,0,0,0.5) 65%, transparent 92%)",
+          WebkitMaskImage:
+            "radial-gradient(closest-side at 50% 50%, #000 40%, rgba(0,0,0,0.5) 65%, transparent 92%)",
+        }}
       />
 
       {/* 3D scene + cube */}
@@ -510,12 +526,18 @@ function CubeFace({
   };
   return (
     <div
-      className="absolute inset-0 overflow-hidden border border-jp-gold-deep/30"
+      className="absolute inset-0 overflow-hidden border border-jp-gold-deep/45"
       style={{
-        backfaceVisibility: "hidden",
+        backfaceVisibility: "visible",
         transform: transforms[face],
+        // Translucent face — the electric field behind shows through, so the
+        // field reads as lightning trapped inside the cube.
         background:
-          "radial-gradient(800px 420px at 50% -20%, rgba(196, 30, 58, 0.3), transparent 55%), radial-gradient(600px 380px at 50% 120%, rgba(224, 255, 87, 0.22), transparent 55%), repeating-linear-gradient(0deg, rgba(184, 220, 74, 0.06) 0, rgba(184, 220, 74, 0.06) 1px, transparent 1px, transparent 48px), repeating-linear-gradient(90deg, rgba(184, 220, 74, 0.06) 0, rgba(184, 220, 74, 0.06) 1px, transparent 1px, transparent 48px), #14100d",
+          "radial-gradient(800px 420px at 50% -20%, rgba(196, 30, 58, 0.28), transparent 55%), radial-gradient(600px 380px at 50% 120%, rgba(224, 255, 87, 0.18), transparent 55%), repeating-linear-gradient(0deg, rgba(184, 220, 74, 0.05) 0, rgba(184, 220, 74, 0.05) 1px, transparent 1px, transparent 48px), repeating-linear-gradient(90deg, rgba(184, 220, 74, 0.05) 0, rgba(184, 220, 74, 0.05) 1px, transparent 1px, transparent 48px), rgba(20, 16, 13, 0.32)",
+        backdropFilter: "blur(3px) saturate(1.05)",
+        WebkitBackdropFilter: "blur(3px) saturate(1.05)",
+        boxShadow:
+          "inset 0 0 60px rgba(224, 255, 87, 0.12), inset 0 0 120px rgba(196, 30, 58, 0.12)",
       }}
     >
       <span
