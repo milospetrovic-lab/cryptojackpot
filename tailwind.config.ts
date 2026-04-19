@@ -33,6 +33,7 @@ const config: Config = {
         display: ["var(--font-cinzel)", "serif"],
         body: ["var(--font-manrope)", "sans-serif"],
         mono: ["var(--font-jetbrains)", "monospace"],
+        bebas: ["var(--font-bebas)", "sans-serif"],
       },
       letterSpacing: {
         vault: "0.25em",

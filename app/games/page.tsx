@@ -180,7 +180,7 @@ export default function GamesPage() {
         <iframe
           src="/demos/comparator.html"
           title="Stage comparator"
-          className="block h-[min(260vh,2400px)] w-full"
+          className="block h-[min(180vh,1600px)] w-full"
           style={{ border: 0, background: "transparent" }}
           loading="lazy"
         />

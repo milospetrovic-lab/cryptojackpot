@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>House Rules — CryptoJackpot</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+@layer reset, tokens, base, layout, cube, ui, cards, reveal, responsive;
+
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+}
+
+@layer tokens {
+  :root {
+    color-scheme: dark;
+    --bg: #0A0A0C;
+    --fg: #FAFAFA;
+    --muted: #A0A0A6;
+    --accent: #FFD700;
+    --accent-2: #C41E3A;
+    --font-display: "Bebas Neue", sans-serif;
+    --font-mono: "DM Mono", "JetBrains Mono", monospace;
+    --hairline: 0.0625rem;
+    --ui-inset: 1.5rem;
+    --card-bg: rgba(10, 10, 12, 0.82);
+    --card-border: rgba(212, 168, 75, 0.22);
+    --nav-x: calc(var(--ui-inset) + 0.125rem);
+    --reveal-offset: 0.625rem;
+    --reveal-duration: 0.5s;
+    --z-ui: 10;
+  }
+}
+
+@layer base {
+  html { color-scheme: dark; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-mono);
+    overflow-x: hidden;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer layout {
+  #scene {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1100px;
+    pointer-events: none;
+  }
+  #scroll_container { position: relative; z-index: 1; }
+  section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 6rem calc(5rem + var(--ui-inset)) 6rem 5rem;
+  }
+}
+
+@layer cube {
+  #cube {
+    --s: min(62vw, 62vh, 520px);
+    width: var(--s);
+    height: var(--s);
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateX(90deg) rotateY(0deg);
+    will-change: transform;
+  }
+  .face {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    backface-visibility: hidden;
+    background:
+      radial-gradient(800px 420px at 50% -20%, rgba(196, 30, 58, 0.28), transparent 55%),
+      radial-gradient(600px 380px at 50% 120%, rgba(255, 215, 0, 0.2), transparent 55%),
+      repeating-linear-gradient(0deg, rgba(212, 175, 55, 0.05) 0, rgba(212, 175, 55, 0.05) 1px, transparent 1px, transparent 48px),
+      repeating-linear-gradient(90deg, rgba(212, 175, 55, 0.05) 0, rgba(212, 175, 55, 0.05) 1px, transparent 1px, transparent 48px),
+      #14100d;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+  }
+  .face .face-title {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.75rem;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 8vw, 5rem);
+    letter-spacing: 0.06em;
+    color: rgba(255, 215, 0, 0.22);
+    pointer-events: none;
+    user-select: none;
+  }
+  .face .face-num {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: rgba(255, 215, 0, 0.55);
+    pointer-events: none;
+    user-select: none;
+  }
+  .face[data-face="front"] { transform: translateZ(calc(var(--s) / 2)); }
+  .face[data-face="back"] { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
+  .face[data-face="right"] { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); }
+  .face[data-face="left"] { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); }
+  .face[data-face="top"] { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); }
+  .face[data-face="bottom"] { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); }
+}
+
+@layer ui {
+  #hud {
+    position: fixed;
+    top: var(--ui-inset);
+    right: var(--ui-inset);
+    z-index: var(--z-ui);
+    text-align: right;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  #hud .progress-bar {
+    width: 7.5rem;
+    height: var(--hairline);
+    background: var(--muted);
+    margin-block-start: 0.5rem;
+    margin-inline-start: auto;
+    position: relative;
+    overflow: hidden;
+  }
+  #hud .progress-fill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.1s linear;
+  }
+  #hud .scene-label {
+    font-size: 0.6rem;
+    color: var(--accent);
+    margin-block-start: 0.4rem;
+  }
+  #scene_strip {
+    position: fixed;
+    left: var(--nav-x);
+    top: 50%;
+    translate: -50% -50%;
+    z-index: var(--z-ui);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .scene-dot {
+    display: block;
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: background 0.3s, scale 0.3s;
+    cursor: pointer;
+  }
+  .scene-dot.active { background: var(--accent); scale: 1.8; }
+
+  #face_caption {
+    position: fixed;
+    bottom: calc(var(--ui-inset) + 60px);
+    left: 50%;
+    translate: -50% 0;
+    z-index: var(--z-ui);
+    text-align: center;
+    pointer-events: none;
+    user-select: none;
+  }
+  #face_caption_num {
+    font-size: 0.58rem;
+    letter-spacing: 0.28em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-block-end: 0.15rem;
+  }
+  #face_caption_name {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 3.5rem);
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    opacity: 0.45;
+    line-height: 1;
+  }
+}
+
+@layer cards {
+  .text-card {
+    max-width: 23.75rem;
+    padding: 2.25rem 2rem;
+    background: var(--card-bg);
+    border-left: var(--hairline) solid var(--card-border);
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    overflow: hidden;
+  }
+  .text-card.right {
+    margin-inline-start: auto;
+    border-left: none;
+    border-right: var(--hairline) solid var(--card-border);
+    text-align: right;
+  }
+  .text-card.right .h-line { margin-inline-start: auto; transform-origin: right; }
+
+  .tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-block-end: 1.1rem;
+  }
+  h1, h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 0.92;
+    color: var(--fg);
+  }
+  h1 { font-size: clamp(3rem, 8vw, 6.5rem); }
+  h2 { font-size: clamp(2.2rem, 5vw, 4rem); }
+  .body-text {
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: color-mix(in srgb, var(--fg) 70%, transparent);
+    margin-block-start: 1.25rem;
+  }
+  .h-line {
+    width: 3.125rem;
+    height: var(--hairline);
+    background: var(--accent);
+    margin-block-end: 1.2rem;
+  }
+  .cta-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-block-start: 1.75rem;
+  }
+  .text-card.right .cta-row { justify-content: flex-end; }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1.25rem;
+    border: var(--hairline) solid var(--accent);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .cta:hover { background: var(--accent); color: var(--bg); }
+  .cta-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1.25rem;
+    border: var(--hairline) solid color-mix(in srgb, var(--muted) 45%, transparent);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .cta-back:hover { background: color-mix(in srgb, var(--muted) 12%, transparent); color: var(--fg); }
+}
+
+@layer reveal {
+  :is(.tag, h1, h2, .body-text, .cta, .cta-back) {
+    opacity: 0;
+    translate: 0 var(--reveal-offset);
+  }
+  :is(h1, h2) {
+    translate: 0 1.125rem;
+    transition: opacity var(--reveal-duration) ease 0.08s,
+      translate var(--reveal-duration) ease 0.08s;
+  }
+  .tag { transition: opacity var(--reveal-duration) ease, translate var(--reveal-duration) ease; }
+  .body-text { transition: opacity var(--reveal-duration) ease 0.2s, translate var(--reveal-duration) ease 0.2s; }
+  :is(.cta, .cta-back) {
+    transition: opacity var(--reveal-duration) ease 0.35s,
+      translate var(--reveal-duration) ease 0.35s, background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .h-line { opacity: 0; scale: 0 1; transition: opacity 0.4s ease, scale 0.4s ease; }
+  :is(.tag, h1, h2, .body-text, .cta, .cta-back).visible { opacity: 1; translate: 0 0; }
+  .h-line.visible { opacity: 1; scale: 1 1; }
+}
+
+@layer responsive {
+  @media (width <= 56.25em) {
+    #hud { top: 1rem; right: 1rem; }
+    #scene_strip { display: none; }
+    #face_caption { bottom: 80px; }
+    section {
+      min-height: 120vh;
+      align-items: flex-end;
+      padding: 0 1.25rem 2.5rem;
+    }
+    #s0 { min-height: 100vh; align-items: center; padding: 4rem 1.25rem; }
+    .text-card, .text-card.right { max-width: 100%; padding: 1.5rem 1.25rem; }
+  }
+}
+</style>
+</head>
+<body>
+<div id="scene">
+  <div id="cube">
+    <div class="face" data-face="top"><span class="face-num">00</span><span class="face-title">DESCEND</span></div>
+    <div class="face" data-face="front"><span class="face-num">01</span><span class="face-title">STAKE</span></div>
+    <div class="face" data-face="right"><span class="face-num">02</span><span class="face-title">SPIN</span></div>
+    <div class="face" data-face="back"><span class="face-num">03</span><span class="face-title">HIT</span></div>
+    <div class="face" data-face="left"><span class="face-num">04</span><span class="face-title">RING</span></div>
+    <div class="face" data-face="bottom"><span class="face-num">05</span><span class="face-title">VAULT</span></div>
+  </div>
+</div>
+
+<div id="hud">
+  <div id="hud_pct">000%</div>
+  <div class="progress-bar"><div class="progress-fill" id="prog_fill"></div></div>
+  <div class="scene-label" id="scene_name">DESCEND</div>
+</div>
+
+<div id="scene_strip"></div>
+
+<div id="face_caption">
+  <div id="face_caption_num">01</div>
+  <div id="face_caption_name">DESCEND</div>
+</div>
+
+<div id="scroll_container">
+  <section id="s0">
+    <div class="text-card">
+      <div class="tag">House Rules — Conduct</div>
+      <h1>YOUR<br>CONTROLS</h1>
+      <p class="body-text">
+        House Rules aren't a restriction. They're how you play with a clear head.
+        Stake limits, reality checks, self-exclusion, the helpline, the record —
+        all visible, nothing buried.
+      </p>
+      <div class="cta-row"><a class="cta" href="#s1">Descend</a></div>
+    </div>
+  </section>
+  <section id="s1">
+    <div class="text-card right">
+      <div class="h-line"></div>
+      <div class="tag">01 — Stake Limits</div>
+      <h2>KNOW<br>THE CAP</h2>
+      <p class="body-text">
+        Daily, weekly, monthly ceilings. Lower takes effect now. Higher takes
+        effect in 24 hours. Set them before your first Spin, not after a cold run.
+      </p>
+      <div class="cta-row"><a class="cta-back" href="#s0">Back</a><a class="cta" href="#s2">Turn</a></div>
+    </div>
+  </section>
+  <section id="s2">
+    <div class="text-card">
+      <div class="h-line"></div>
+      <div class="tag">02 — Reality Check</div>
+      <h2>AN<br>INTERVAL<br>OF QUIET</h2>
+      <p class="body-text">
+        Every N minutes of Spinning the lounge pauses and shows you your session
+        summary: Stake in, Stake out, time at the table. Set N between 5 and 120.
+      </p>
+      <div class="cta-row"><a class="cta-back" href="#s1">Back</a><a class="cta" href="#s3">Turn</a></div>
+    </div>
+  </section>
+  <section id="s3">
+    <div class="text-card right">
+      <div class="h-line"></div>
+      <div class="tag">03 — Self-Exclusion</div>
+      <h2>LOCK<br>THE DOOR</h2>
+      <p class="body-text">
+        24 hours. 7 days. 6 months. Permanent. Once active, no Spin, no deposit,
+        no Drop claim. The Concierge will not ask you to reconsider.
+      </p>
+      <div class="cta-row"><a class="cta-back" href="#s2">Back</a><a class="cta" href="#s4">Turn</a></div>
+    </div>
+  </section>
+  <section id="s4">
+    <div class="text-card">
+      <div class="h-line"></div>
+      <div class="tag">04 — Helplines</div>
+      <h2>NOT<br>ALONE</h2>
+      <p class="body-text">
+        US: 1-800-GAMBLER · UK: 0808 8020 133 (GamCare) · EU: gamblingtherapy.org
+        · AU: 1800 858 858. 24/7, multilingual where it counts. The lounge will
+        route you without questions.
+      </p>
+      <div class="cta-row"><a class="cta-back" href="#s3">Back</a><a class="cta" href="#s5">Turn</a></div>
+    </div>
+  </section>
+  <section id="s5">
+    <div class="text-card right">
+      <div class="h-line"></div>
+      <div class="tag">05 — Record</div>
+      <h2>THE<br>LEDGER</h2>
+      <p class="body-text">
+        30-, 90-, 365-day loss and win ledger, exportable. Your record is your
+        record. The House keeps it; the House shows it on request.
+      </p>
+      <div class="cta-row"><a class="cta-back" href="#s4">Back</a><a class="cta" href="#s0">Begin again</a></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const FACE_NAMES = ["DESCEND", "STAKE", "SPIN", "HIT", "RING", "VAULT"];
+const N = 6;
+
+function buildStops(n) {
+  const base = [
+    { rx: 90, ry: 0 },
+    { rx: 0, ry: 0 },
+    { rx: 0, ry: -90 },
+    { rx: 0, ry: -180 },
+    { rx: 0, ry: -270 },
+    { rx: -90, ry: -360 }
+  ];
+  return base.slice(0, n);
+}
+const STOPS = buildStops(N);
+
+const dom = {
+  cube: document.getElementById("cube"),
+  faces: [...document.querySelectorAll(".face")],
+  scrollEl: document.getElementById("scroll_container"),
+  strip: document.getElementById("scene_strip"),
+  hudPct: document.getElementById("hud_pct"),
+  progFill: document.getElementById("prog_fill"),
+  sceneName: document.getElementById("scene_name"),
+  captionNum: document.getElementById("face_caption_num"),
+  captionName: document.getElementById("face_caption_name"),
+};
+
+dom.strip.innerHTML = "";
+for (let i = 0; i < N; i++) {
+  const a = document.createElement("a");
+  a.href = `#s${i}`;
+  a.className = "scene-dot" + (i === 0 ? " active" : "");
+  dom.strip.appendChild(a);
+}
+const sceneDots = [...document.querySelectorAll(".scene-dot")];
+const sections = [...document.querySelectorAll("#scroll_container section")];
+
+const easeIO = (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+
+const setCubeTransform = (s) => {
+  const t = s * (N - 1);
+  const i = Math.min(Math.floor(t), N - 2);
+  const f = easeIO(t - i);
+  const a = STOPS[i];
+  const b = STOPS[i + 1];
+  const rx = a.rx + (b.rx - a.rx) * f;
+  const ry = a.ry + (b.ry - a.ry) * f;
+  dom.cube.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+};
+
+let sectionTops = [];
+const buildSectionTops = () => {
+  sectionTops = sections.map((s) => s.getBoundingClientRect().top + window.scrollY);
+};
+
+const sectionIndexFromScroll = (y) => {
+  const mid = y + innerHeight * 0.5;
+  let idx = 0;
+  for (let i = 0; i < sectionTops.length; i++) {
+    if (mid >= sectionTops[i]) idx = i;
+  }
+  return Math.min(idx, N - 1);
+};
+
+let lastFaceIdx = -1;
+const updateHUD = (s) => {
+  const p = Math.round(s * 100);
+  const si = sectionIndexFromScroll(scrollY);
+  dom.hudPct.textContent = String(p).padStart(3, "0") + "%";
+  dom.progFill.style.width = `${p}%`;
+  if (si !== lastFaceIdx) {
+    lastFaceIdx = si;
+    const name = FACE_NAMES[si] ?? "";
+    dom.sceneName.textContent = name;
+    dom.captionNum.textContent = String(si + 1).padStart(2, "0");
+    dom.captionName.textContent = name;
+    sceneDots.forEach((d, i) => d.classList.toggle("active", i === si));
+  }
+};
+
+let maxScroll = 1;
+const resize = () => {
+  maxScroll = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+  buildSectionTops();
+};
+resize();
+window.addEventListener("resize", resize);
+
+let tgt = 0, smooth = 0;
+window.addEventListener("scroll", () => {
+  tgt = maxScroll > 0 ? scrollY / maxScroll : 0;
+}, { passive: true });
+
+let lastNow = performance.now();
+function frame(now) {
+  const dt = Math.min((now - lastNow) / 1000, 0.05);
+  lastNow = now;
+  smooth += (tgt - smooth) * (1 - Math.exp(-dt * 8));
+  updateHUD(smooth);
+  setCubeTransform(smooth);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+const revealEls = [...document.querySelectorAll(".tag, h1, h2, .body-text, .cta, .cta-back, .h-line")];
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (e.isIntersecting) {
+      e.target.classList.add("visible");
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+revealEls.forEach((el) => io.observe(el));
+
+document.addEventListener("click", (e) => {
+  const a = e.target.closest('a[href^="#s"]');
+  if (!a) return;
+  const target = document.querySelector(a.getAttribute("href"));
+  if (!target) return;
+  e.preventDefault();
+  const y = target.getBoundingClientRect().top + window.scrollY;
+  window.scrollTo({ top: y, behavior: "smooth" });
+});
+</script>
+</body>
+</html>

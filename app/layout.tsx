@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cinzel, Manrope, JetBrains_Mono } from "next/font/google";
+import { Cinzel, Manrope, JetBrains_Mono, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import { Preloader } from "@/components/layout/Preloader";
 import { Navbar } from "@/components/layout/Navbar";
@@ -28,6 +28,13 @@ const jetbrains = JetBrains_Mono({
   display: "swap",
 });
 
+const bebas = Bebas_Neue({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-bebas",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "cryptojackpot — where the molten meets the jackpot.",
   description:
@@ -47,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${cinzel.variable} ${manrope.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={`${cinzel.variable} ${manrope.variable} ${jetbrains.variable} ${bebas.variable}`}>
       <body>
         <Atmosphere />
         <ScrollProgress />
