@@ -65,21 +65,17 @@ export function Preloader() {
         });
       };
 
-      const min = gsap.delayedCall(1.6, () => {});
-      const onReady = () => {
-        if (min.progress() < 1) {
-          min.eventCallback("onComplete", finish);
-        } else {
-          finish();
-        }
+      // Hard cap — preloader never holds the page more than 1.6s.
+      // Whichever fires first (window.load, gsap timer) wins; finish is idempotent.
+      let done = false;
+      const once = () => {
+        if (done) return;
+        done = true;
+        finish();
       };
 
-      if (document.readyState === "complete") {
-        gsap.delayedCall(1.6, finish);
-      } else {
-        window.addEventListener("load", onReady, { once: true });
-        gsap.delayedCall(3.5, finish); // safety
-      }
+      window.addEventListener("load", once, { once: true });
+      gsap.delayedCall(1.6, once);
     }, rootRef);
 
     return () => ctx.revert();

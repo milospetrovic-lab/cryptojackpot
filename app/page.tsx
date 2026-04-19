@@ -17,32 +17,32 @@ export default function Home() {
       <PromoBanner />
 
       {/* HERO */}
-      <section className="relative min-h-screen overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden">
+        {/* layer 1 — magneto attractor field (vanilla JS canvas iframe) */}
         <MagnetoField />
 
-        <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 pt-32">
+        {/* layer 2 — content */}
+        <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 pt-36 pb-20 text-center">
           <div className="eyebrow mb-6">The Vulcan VIP Casino</div>
 
-          {/* coin + particle brand stack */}
-          <div className="relative mb-10 flex h-[clamp(260px,45vh,520px)] w-full max-w-[720px] items-center justify-center">
-            {/* hero coin */}
-            <img
-              src="/images/hero/center-coin-hero.png"
-              alt="CryptoJackpot coin"
-              className="absolute inset-0 m-auto h-[80%] w-auto max-w-[70%] select-none object-contain drop-shadow-[0_0_60px_rgba(255,215,0,0.35)]"
-              draggable={false}
-            />
-            {/* particle brand over top */}
-            <div className="absolute inset-0 z-10">
-              <ParticleBrand />
-            </div>
+          {/* Particle-written brand lockup — fills its own band behind the coin */}
+          <div className="relative mb-8 flex h-[clamp(200px,36vh,360px)] w-full items-center justify-center">
+            <ParticleBrand />
           </div>
 
-          <p className="max-w-2xl text-center text-base leading-relaxed text-jp-mute md:text-lg">
-            Where the molten meets the jackpot.
+          {/* Hero coin (transparent PNG from user) */}
+          <img
+            src="/images/hero/center-coin-hero.png"
+            alt="CryptoJackpot coin"
+            className="pointer-events-none mb-8 h-[clamp(120px,18vh,220px)] w-auto select-none object-contain drop-shadow-[0_0_60px_rgba(255,215,0,0.35)]"
+            draggable={false}
+          />
+
+          <p className="max-w-xl text-center text-base leading-relaxed text-jp-mute md:text-lg">
+            where the molten meets the jackpot.
           </p>
 
-          <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row">
+          <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row">
             <Link
               href="/games"
               className="group relative overflow-hidden rounded-full bg-gradient-to-b from-jp-gold-pale via-jp-gold to-jp-gold-deep px-8 py-3.5 text-[12px] font-bold uppercase tracking-[0.26em] text-jp-obsidian shadow-gold-glow transition-transform hover:-translate-y-0.5"
@@ -63,7 +63,7 @@ export default function Home() {
 
           <div className="mt-14 flex items-center gap-3 text-[10px] uppercase tracking-[0.35em] text-jp-dim">
             <span className="h-px w-8 bg-jp-gold-deep/50" />
-            <span>Scroll · Descend into the chamber</span>
+            <span>scroll · descend into the chamber</span>
             <span className="h-px w-8 bg-jp-gold-deep/50" />
           </div>
         </div>

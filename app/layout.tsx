@@ -29,12 +29,12 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CryptoJackpot — Where the molten meets the jackpot.",
+  title: "cryptojackpot — where the molten meets the jackpot.",
   description:
-    "A Vulcan VIP crypto casino. Every Spin rings the Vault — gold, black, molten red. Built for the high-roller lounge at 2am.",
-  metadataBase: new URL("https://cryptojackpot.example.com"),
+    "The Vulcan VIP crypto casino. Every Spin rings the Vault — gold, black, molten red. Built for the high-roller lounge at 2am.",
+  metadataBase: new URL("https://site-v1-five.vercel.app"),
   openGraph: {
-    title: "CryptoJackpot",
+    title: "cryptojackpot",
     description: "Where the molten meets the jackpot.",
     type: "website",
   },
