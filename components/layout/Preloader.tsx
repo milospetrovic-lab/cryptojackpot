@@ -88,13 +88,13 @@ export function Preloader() {
       ref={rootRef}
       className="fixed inset-0 z-[300] flex flex-col items-center justify-center bg-jp-obsidian"
     >
-      {/* Hero coin — same image used on the landing page */}
+      {/* Hero coin — same image used on the landing page. Responsive so
+          it stays centered and comfortably-sized on phones. */}
       <img
         ref={chipRef}
         src="/images/hero/center-coin-hero.png"
         alt="CryptoJackpot"
-        width={180}
-        height={180}
+        className="h-[clamp(120px,34vw,200px)] w-[clamp(120px,34vw,200px)]"
         style={{
           objectFit: "contain",
           filter: "drop-shadow(0 0 40px rgba(224,255,87,0.55))",

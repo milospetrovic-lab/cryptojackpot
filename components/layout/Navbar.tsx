@@ -69,14 +69,14 @@ export function Navbar() {
         </Link>
 
         {/* Burger — mobile only, absolute-positioned so the logo stays
-            optically centered */}
+            optically centered. Gold border + glow so it is unmistakable. */}
         <button
           aria-label="Open menu"
           aria-expanded={open}
           onClick={() => setOpen(true)}
-          className="absolute right-5 top-4 grid h-10 w-10 place-items-center rounded-full border border-jp-gold-deep/40 bg-black/50 text-jp-gold backdrop-blur-md transition hover:border-jp-gold hover:bg-black/70 md:hidden"
+          className="absolute right-4 top-3 z-[160] grid h-11 w-11 place-items-center rounded-full border-2 border-jp-gold bg-black/85 text-jp-gold shadow-[0_0_18px_rgba(224,255,87,0.4)] backdrop-blur-md transition hover:bg-jp-gold hover:text-jp-obsidian md:hidden"
         >
-          <Menu size={18} />
+          <Menu size={20} strokeWidth={2.4} />
         </button>
       </header>
 

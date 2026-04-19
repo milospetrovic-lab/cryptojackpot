@@ -105,9 +105,14 @@ export function DropsCarousel() {
     [N, transitionText]
   );
 
-  // Scroll-driven auto-advance: section is pinned for N × 100vh, and the
-  // scroll progress maps to the slide index.
+  // Scroll-driven auto-advance — DESKTOP ONLY. On mobile the pin+snap
+  // interacts badly with the URL bar / bouncy scroll, so the carousel
+  // is plain scrolls-past + manual arrow/dot navigation.
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    if (!isDesktop) return;
+
     const ctx = gsap.context(() => {
       const st = ScrollTrigger.create({
         trigger: rootRef.current,
@@ -140,14 +145,19 @@ export function DropsCarousel() {
   return (
     <section
       ref={rootRef}
-      className="relative"
-      // pinned section occupies (N) viewport-heights of scroll so each slide
-      // gets its own slice
-      style={{ minHeight: `${N * 100}vh` }}
+      className="relative py-16 md:py-0 md:[min-height:var(--dc-h)]"
+      style={
+        {
+          // Desktop: N viewport-heights of scroll so each slide pins for one
+          // viewport. Mobile: render as a normal static section (single
+          // viewport-height), no pin, no snap.
+          "--dc-h": `${N * 100}vh`,
+        } as React.CSSProperties
+      }
     >
       <div
         ref={pinRef}
-        className="flex h-[100svh] w-full items-center justify-center px-6"
+        className="flex min-h-[560px] w-full items-center justify-center px-6 md:h-[100svh]"
       >
         <div className="relative mx-auto w-full max-w-6xl">
           <div className="mb-8 text-center">

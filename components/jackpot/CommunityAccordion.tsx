@@ -109,7 +109,7 @@ export function CommunityAccordion() {
       const rows = items
         .map((it, i) => {
           it.dataset.active = i === active ? "true" : "false";
-          return i === active ? "10fr" : "1fr";
+          return i === active ? "3.2fr" : "1fr";
         })
         .join(" ");
       list.style.setProperty("grid-template-rows", rows);
@@ -164,9 +164,9 @@ export function CommunityAccordion() {
 
       <style>{`
         .comm-grid {
-          --gap: 10px;
-          --base: clamp(3rem, 10cqi, 76px);
-          --speed: 0.6s;
+          --gap: 8px;
+          --base: 56px;
+          --speed: 0.55s;
           --easing: linear(
             0 0%, 0.1538 4.09%, 0.2926 8.29%, 0.4173 12.63%,
             0.5282 17.12%, 0.6255 21.77%, 0.7099 26.61%, 0.782 31.67%,
@@ -175,17 +175,17 @@ export function CommunityAccordion() {
           );
           container-type: inline-size;
           display: grid;
-          /* VERTICAL stacking — rows expand instead of columns */
-          grid-template-rows: 10fr 1fr 1fr 1fr 1fr 1fr;
+          /* Vertical stacking — active row expands ~3× collapsed, not 10× */
+          grid-template-rows: 3.2fr 1fr 1fr 1fr 1fr 1fr;
           grid-template-columns: 1fr;
           gap: var(--gap);
           list-style: none;
           padding: 0;
           margin: 0 auto;
           width: 100%;
-          max-width: 880px;
-          /* tall so each row has breathing room when expanded */
-          min-height: clamp(640px, 100dvh, 1040px);
+          max-width: 840px;
+          /* Much tighter than before — rows are compact; active stays readable */
+          min-height: clamp(460px, 58dvh, 620px);
           transition: grid-template-rows var(--speed) var(--easing);
         }
         .comm-item {
@@ -306,9 +306,16 @@ export function CommunityAccordion() {
 
         @media (max-width: 48em) {
           .comm-grid {
-            min-height: clamp(520px, 90dvh, 880px);
+            --base: 48px;
+            min-height: clamp(380px, 52dvh, 520px);
+            grid-template-rows: 3.2fr 1fr 1fr 1fr 1fr 1fr;
           }
-          .comm-item article h3 { font-size: 1.1rem; letter-spacing: 0.2em; }
+          .comm-item article {
+            padding: calc(var(--base) * 0.5 - 8px) 1rem 0.9rem;
+          }
+          .comm-item article h3 { font-size: 1rem; letter-spacing: 0.2em; left: 1rem; }
+          .comm-item .comm-icon { right: 1rem; }
+          .comm-item article p { font-size: 12px; }
         }
       `}</style>
     </section>
