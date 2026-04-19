@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --jp-charcoal: #0a0a0c;
+  --jp-obsidian: #000000;
+  --jp-steel: #1a1a1d;
+  --jp-smoke: #2a2a2e;
+  --jp-gold: #ffd700;
+  --jp-gold-deep: #d4af37;
+  --jp-gold-warm: #f0c948;
+  --jp-gold-pale: #ffe88a;
+  --jp-ruby: #c41e3a;
+  --jp-molten: #e63946;
+  --jp-crimson: #8b1a2b;
+  --jp-white: #fafafa;
+  --jp-mute: #a0a0a6;
+  --jp-dim: #5a5a60;
+}
+
+html,
+body {
+  background: var(--jp-charcoal);
+  color: var(--jp-white);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--jp-gold);
+  color: var(--jp-obsidian);
+}
+
+/* Scrollbar tuned to the lounge */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--jp-gold-deep), var(--jp-crimson));
+  border-radius: 8px;
+}
+
+@layer utilities {
+  .eyebrow {
+    font-family: var(--font-manrope);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--jp-gold);
+  }
+  .display {
+    font-family: var(--font-cinzel);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+  }
+  .tabular {
+    font-family: var(--font-jetbrains);
+    font-variant-numeric: tabular-nums;
+  }
+  .gold-text {
+    background: linear-gradient(180deg, var(--jp-gold-pale) 0%, var(--jp-gold) 45%, var(--jp-gold-deep) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .lounge-card {
+    background: linear-gradient(180deg, rgba(26,26,29,0.85), rgba(10,10,12,0.9));
+    border: 1px solid rgba(212,175,55,0.18);
+    backdrop-filter: blur(14px);
+  }
+  .gold-divider {
+    background: linear-gradient(90deg, transparent, var(--jp-gold-deep), transparent);
+    height: 1px;
+  }
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--jp-gold), var(--jp-ruby));
+    z-index: 200;
+    transition: width 80ms linear;
+  }
+}
+
+/* Respect reduced motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
