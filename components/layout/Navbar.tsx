@@ -44,8 +44,8 @@ export function Navbar() {
 
   return (
     <>
-      {/* TOP — logo as free-floating text + coin, no surrounding box */}
-      <header className="fixed inset-x-0 top-0 z-[150] flex items-center justify-between px-5 pt-4 md:px-8 md:pt-5">
+      {/* TOP — logo centered, burger floated right on mobile */}
+      <header className="fixed inset-x-0 top-0 z-[150] flex items-center justify-center px-5 pt-4 md:px-8 md:pt-5">
         <Link
           href="/"
           className="flex items-center gap-2.5 no-underline"
@@ -68,12 +68,13 @@ export function Navbar() {
           </span>
         </Link>
 
-        {/* Burger — mobile only. Desktop uses the bottom nav as primary. */}
+        {/* Burger — mobile only, absolute-positioned so the logo stays
+            optically centered */}
         <button
           aria-label="Open menu"
           aria-expanded={open}
           onClick={() => setOpen(true)}
-          className="grid h-10 w-10 place-items-center rounded-full border border-jp-gold-deep/40 bg-black/50 text-jp-gold backdrop-blur-md transition hover:border-jp-gold hover:bg-black/70 md:hidden"
+          className="absolute right-5 top-4 grid h-10 w-10 place-items-center rounded-full border border-jp-gold-deep/40 bg-black/50 text-jp-gold backdrop-blur-md transition hover:border-jp-gold hover:bg-black/70 md:hidden"
         >
           <Menu size={18} />
         </button>
