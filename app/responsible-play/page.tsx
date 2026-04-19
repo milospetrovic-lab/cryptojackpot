@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { HouseCube } from "@/components/house/HouseCube";
 
 export const metadata: Metadata = {
   title: "House Rules — cryptojackpot",
@@ -7,14 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function ResponsiblePlayPage() {
-  return (
-    <div className="relative">
-      <iframe
-        src="/demos/house-cube.html"
-        title="House Rules — the Cube"
-        className="block min-h-[100vh] w-full"
-        style={{ border: 0, height: "calc(100svh * 3.7)" }}
-      />
-    </div>
-  );
+  return <HouseCube />;
 }
