@@ -69,6 +69,9 @@ export default function Home() {
       {/* DEPOSIT TRIO — crypto deposit rails */}
       <DepositTrio />
 
+      {/* THE DOOR — sign-in keypad (moved up to be the 3rd component) */}
+      <SignInKeypad />
+
       {/* BANNER — particles.js + crypto 3D render */}
       <BannerCard />
 
@@ -114,9 +117,6 @@ export default function Home() {
 
       {/* COMMUNITY */}
       <CommunitySection />
-
-      {/* SIGN-IN KEYPAD */}
-      <SignInKeypad />
 
       {/* FAQ */}
       <FAQ />

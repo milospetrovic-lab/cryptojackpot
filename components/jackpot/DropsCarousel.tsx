@@ -1,252 +1,288 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 type Slide = {
   name: string;
   place: string;
   desc: string;
-  img: string;
   code: string;
   playthrough: string;
+  /** CSS filter applied to the shared Vulcan molten-gold card art */
+  filter: string;
 };
+
+const CARD = "/images/cards/molten-gold.png";
 
 const SLIDES: Slide[] = [
   {
     name: "Opening Hand",
     place: "300% match · new Rollers",
-    desc: "Drop your first Stake and take 3× back. 150 House Chips seeded on Molten Gold Deluxe.",
-    img: "https://images.unsplash.com/photo-1518544801976-3e188ea7fe41?auto=format&fit=crop&w=1200&q=80",
+    desc:
+      "Drop your first Stake and take 3× back. 150 House Chips seeded on Molten Gold Deluxe.",
     code: "VULCAN300",
     playthrough: "Play-through 30×",
+    filter: "saturate(1) brightness(1)",
   },
   {
     name: "Weekly Showdown",
     place: "Friday 20:00 UTC",
-    desc: "10 BTC guaranteed prize pool. Top 50 placements paid. Leaderboard freezes at drop.",
-    img: "https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&w=1200&q=80",
+    desc:
+      "10 BTC guaranteed prize pool. Top 50 placements paid. Leaderboard freezes at drop.",
     code: "SHOWDOWN",
     playthrough: "No Play-through",
+    filter: "hue-rotate(-15deg) saturate(1.25) brightness(1.02)",
   },
   {
     name: "Ruby Run",
     place: "Every Sunday · reload",
-    desc: "150% match up to 0.75 BTC with 75 House Chips on Ruby Run. Stacks with weekly Retainer.",
-    img: "https://images.unsplash.com/photo-1603481588273-2f908a9a7a1b?auto=format&fit=crop&w=1200&q=80",
+    desc:
+      "150% match up to 0.75 BTC with 75 House Chips on Ruby Run. Stacks with weekly Retainer.",
     code: "RUBYRUN",
     playthrough: "Play-through 25×",
+    filter: "hue-rotate(-40deg) saturate(1.4) brightness(0.92)",
   },
 ];
 
 /**
- * DropsCarousel — 3D rotating showcase, GSAP-driven. Adapted from the
- * DevLoop codepen: three cards (prev / current / next) swap position on
- * button press, background image cross-fades, copy block slides up and
- * back in. Hover the active card to tilt it. Replaces the old DropsRow.
+ * DropsCarousel — scroll-driven 3D carousel using the Vulcan molten-gold
+ * card art. ScrollTrigger pins the section and snaps between slides as
+ * the user scrolls; arrows + dots still work for mouse/touch nudges.
  */
 export function DropsCarousel() {
   const [index, setIndex] = useState(0);
-  const [animating, setAnimating] = useState(false);
-  const cardsRef = useRef<HTMLDivElement>(null);
-  const infoRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const animatingRef = useRef(false);
+  const lastIndexRef = useRef(0);
 
   const N = SLIDES.length;
   const prev = (index - 1 + N) % N;
   const next = (index + 1) % N;
 
-  function go(dir: 1 | -1) {
-    if (animating) return;
-    setAnimating(true);
-    const textEls = infoRef.current?.querySelectorAll(".dc-text") ?? [];
-    gsap
-      .timeline()
-      .to(textEls, {
-        duration: 0.28,
-        stagger: 0.06,
-        y: -60,
-        opacity: 0,
-      })
-      .call(() => {
-        setIndex((i) => (i + dir + N) % N);
-      })
-      .fromTo(
-        ".dc-text-incoming",
-        { y: 40, opacity: 0 },
-        {
-          duration: 0.34,
-          stagger: 0.08,
-          y: 0,
-          opacity: 1,
-          onComplete: () => setAnimating(false),
-        }
-      );
-  }
+  const transitionText = useCallback(() => {
+    const incoming = rootRef.current?.querySelectorAll(".dc-text-new");
+    if (!incoming) return;
+    gsap.fromTo(
+      incoming,
+      { y: 36, opacity: 0 },
+      { duration: 0.38, stagger: 0.08, y: 0, opacity: 1, ease: "power3.out" }
+    );
+  }, []);
 
-  // subtle tilt on mouse-move over the active card
+  const goTo = useCallback(
+    (target: number) => {
+      if (animatingRef.current) return;
+      const clamped = ((target % N) + N) % N;
+      if (clamped === lastIndexRef.current) return;
+      animatingRef.current = true;
+      const oldEls = rootRef.current?.querySelectorAll(".dc-text-live");
+      gsap
+        .timeline({
+          onComplete: () => {
+            animatingRef.current = false;
+            transitionText();
+          },
+        })
+        .to(oldEls || [], {
+          duration: 0.26,
+          y: -48,
+          opacity: 0,
+          stagger: 0.05,
+        })
+        .call(() => {
+          lastIndexRef.current = clamped;
+          setIndex(clamped);
+        });
+    },
+    [N, transitionText]
+  );
+
+  // Scroll-driven auto-advance: section is pinned for N × 100vh, and the
+  // scroll progress maps to the slide index.
   useEffect(() => {
-    const el = cardsRef.current?.querySelector<HTMLDivElement>(".dc-current");
-    if (!el) return;
-    const onMove = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
-      const angle = ((e.clientX - (r.left + r.width / 2)) / r.width) * 30;
-      gsap.to(el, { rotationY: angle, duration: 0.3 });
-    };
-    const onOut = () => gsap.to(el, { rotationY: 0, duration: 0.4 });
-    el.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerout", onOut);
-    return () => {
-      el.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerout", onOut);
-    };
-  }, [index]);
+    const ctx = gsap.context(() => {
+      const st = ScrollTrigger.create({
+        trigger: rootRef.current,
+        start: "top top",
+        end: () => `+=${(N - 1) * 100}%`,
+        pin: pinRef.current,
+        scrub: false,
+        anticipatePin: 1,
+        snap: {
+          snapTo: (progress) => Math.round(progress * (N - 1)) / (N - 1),
+          duration: 0.3,
+          ease: "power2.inOut",
+        },
+        onUpdate: (self) => {
+          const target = Math.round(self.progress * (N - 1));
+          if (target !== lastIndexRef.current) goTo(target);
+        },
+      });
+      return () => {
+        st.kill();
+      };
+    }, rootRef);
+    return () => ctx.revert();
+  }, [N, goTo]);
 
   const current = SLIDES[index];
   const prevSlide = SLIDES[prev];
   const nextSlide = SLIDES[next];
 
   return (
-    <section className="relative mx-auto max-w-6xl px-6 py-24">
-      <div className="mb-10 text-center">
-        <div className="eyebrow">Live This Week</div>
-        <h2 className="font-bebas mt-2 text-[clamp(2.2rem,5.5vw,4.2rem)] leading-[0.92] tracking-[0.04em] text-jp-white">
-          THE <span className="gold-text">DROPS</span>
-        </h2>
-      </div>
+    <section
+      ref={rootRef}
+      className="relative"
+      // pinned section occupies (N) viewport-heights of scroll so each slide
+      // gets its own slice
+      style={{ minHeight: `${N * 100}vh` }}
+    >
+      <div
+        ref={pinRef}
+        className="flex h-[100svh] w-full items-center justify-center px-6"
+      >
+        <div className="relative mx-auto w-full max-w-6xl">
+          <div className="mb-8 text-center">
+            <div className="eyebrow">Live This Week</div>
+            <h2 className="font-bebas mt-2 text-[clamp(2.2rem,5.5vw,4.2rem)] leading-[0.92] tracking-[0.04em] text-jp-white">
+              THE <span className="gold-text">DROPS</span>
+            </h2>
+            <p className="mx-auto mt-2 font-mono text-[10px] uppercase tracking-[0.3em] text-jp-dim">
+              Scroll · the deck cycles · or tap an arrow
+            </p>
+          </div>
 
-      <div className="relative mx-auto w-full max-w-[900px]">
-        {/* blurred background reflecting the current slide */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-10 -bottom-10 -z-10 overflow-hidden rounded-3xl"
-        >
-          <img
-            key={current.img}
-            src={current.img}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ filter: "blur(28px) saturate(1.1)", opacity: 0.35 }}
-          />
-          <div className="absolute inset-0 bg-black/70" />
-        </div>
-
-        <div
-          className="relative grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
-          style={{ perspective: 1200 }}
-        >
-          {/* Card stack */}
           <div
-            ref={cardsRef}
-            className="relative mx-auto h-[380px] w-full max-w-[560px] md:h-[440px]"
-            style={{ transformStyle: "preserve-3d" }}
+            className="relative mx-auto grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+            style={{ perspective: 1400 }}
           >
-            {[
-              { slide: prevSlide, pos: "prev" },
-              { slide: nextSlide, pos: "next" },
-              { slide: current, pos: "current" },
-            ].map(({ slide, pos }) => (
-              <div
-                key={`${pos}-${slide.code}`}
-                className={
-                  "dc-card absolute left-1/2 top-1/2 h-[260px] w-[180px] overflow-hidden rounded-xl border border-jp-gold-deep/40 md:h-[320px] md:w-[220px] " +
-                  (pos === "current" ? "dc-current" : "")
-                }
-                style={{
-                  transform:
-                    pos === "current"
-                      ? "translate(-50%, -50%) translateX(0) rotateY(0) scale(1.18)"
-                      : pos === "prev"
-                      ? "translate(-50%, -50%) translateX(calc(-100% - 20px)) rotateY(28deg) scale(0.88)"
-                      : "translate(-50%, -50%) translateX(calc(100% + 20px)) rotateY(-28deg) scale(0.88)",
-                  transition: "transform 0.8s ease",
-                  zIndex: pos === "current" ? 3 : 1,
-                  opacity: pos === "current" ? 1 : 0.55,
-                }}
-              >
-                <img
-                  src={slide.img}
-                  alt={slide.name}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <span className="absolute left-3 top-3 rounded-full border border-jp-gold-deep/50 bg-black/60 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.25em] text-jp-gold">
-                  {slide.code}
-                </span>
-                <div className="absolute bottom-3 left-3 right-3">
-                  <div className="font-bebas text-xl leading-[0.95] tracking-[0.04em] text-jp-gold">
-                    {slide.name.toUpperCase()}
+            {/* Card stack */}
+            <div
+              className="relative mx-auto h-[300px] w-full max-w-[560px] md:h-[380px]"
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              {[
+                { slide: prevSlide, pos: "prev" },
+                { slide: nextSlide, pos: "next" },
+                { slide: current, pos: "current" },
+              ].map(({ slide, pos }) => (
+                <div
+                  key={`${pos}-${slide.code}`}
+                  className={
+                    "absolute left-1/2 top-1/2 h-[220px] w-[160px] overflow-hidden rounded-xl border border-jp-gold-deep/50 md:h-[300px] md:w-[210px] " +
+                    (pos === "current" ? "dc-current shadow-gold-glow" : "")
+                  }
+                  style={{
+                    transform:
+                      pos === "current"
+                        ? "translate(-50%, -50%) translateX(0) rotateY(0) scale(1.22)"
+                        : pos === "prev"
+                        ? "translate(-50%, -50%) translateX(calc(-100% - 24px)) rotateY(32deg) scale(0.86)"
+                        : "translate(-50%, -50%) translateX(calc(100% + 24px)) rotateY(-32deg) scale(0.86)",
+                    transition: "transform 0.7s cubic-bezier(.22,.9,.2,1)",
+                    zIndex: pos === "current" ? 3 : 1,
+                    opacity: pos === "current" ? 1 : 0.4,
+                    background: "#0A0A0C",
+                  }}
+                >
+                  <img
+                    src={CARD}
+                    alt={slide.name}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    style={{ filter: slide.filter }}
+                    draggable={false}
+                  />
+                  {/* Edge vignette + sheen */}
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(10,10,12,0) 40%, rgba(10,10,12,0.85) 100%)",
+                    }}
+                  />
+                  <span className="absolute left-3 top-3 rounded-full border border-jp-gold-deep/60 bg-black/60 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.25em] text-jp-gold">
+                    {slide.code}
+                  </span>
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <div className="font-bebas text-xl leading-[0.95] tracking-[0.04em] text-jp-gold">
+                      {slide.name.toUpperCase()}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          {/* Info column */}
-          <div ref={infoRef} className="relative min-h-[320px]">
-            <div
-              key={current.code}
-              className="absolute inset-0 flex flex-col justify-center"
-            >
-              <div className="dc-text dc-text-incoming font-mono text-[10px] uppercase tracking-[0.3em] text-jp-gold">
-                {current.place}
-              </div>
-              <h3 className="dc-text dc-text-incoming font-bebas mt-3 text-[clamp(2rem,4vw,3.2rem)] leading-[0.95] tracking-[0.04em] text-jp-white">
-                {current.name.toUpperCase()}
-              </h3>
-              <p className="dc-text dc-text-incoming mt-4 max-w-md text-sm leading-relaxed text-jp-mute md:text-base">
-                {current.desc}
-              </p>
-              <div className="dc-text dc-text-incoming mt-5 flex flex-wrap gap-2">
-                <span className="rounded-full border border-jp-ruby/50 bg-jp-ruby/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-jp-molten">
-                  {current.playthrough}
-                </span>
-                <span className="rounded-full border border-jp-gold-deep/40 bg-black/50 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-jp-gold">
-                  Code · {current.code}
-                </span>
-              </div>
-              <a
-                href="/promotions"
-                className="dc-text dc-text-incoming mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-gradient-to-b from-jp-gold-pale via-jp-gold to-jp-gold-deep px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-jp-obsidian shadow-gold-glow"
+            {/* Info column */}
+            <div className="relative min-h-[260px]">
+              <div
+                key={current.code}
+                className="absolute inset-0 flex flex-col justify-center"
               >
-                Claim Drop →
-              </a>
+                <div className="dc-text-live dc-text-new font-mono text-[10px] uppercase tracking-[0.3em] text-jp-gold">
+                  {current.place}
+                </div>
+                <h3 className="dc-text-live dc-text-new font-bebas mt-3 text-[clamp(2rem,4vw,3.2rem)] leading-[0.95] tracking-[0.04em] text-jp-white">
+                  {current.name.toUpperCase()}
+                </h3>
+                <p className="dc-text-live dc-text-new mt-4 max-w-md text-sm leading-relaxed text-jp-mute md:text-base">
+                  {current.desc}
+                </p>
+                <div className="dc-text-live dc-text-new mt-5 flex flex-wrap gap-2">
+                  <span className="rounded-full border border-jp-ruby/50 bg-jp-ruby/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-jp-molten">
+                    {current.playthrough}
+                  </span>
+                  <span className="rounded-full border border-jp-gold-deep/40 bg-black/50 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] text-jp-gold">
+                    Code · {current.code}
+                  </span>
+                </div>
+                <a
+                  href="/promotions"
+                  className="dc-text-live dc-text-new mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-gradient-to-b from-jp-gold-pale via-jp-gold to-jp-gold-deep px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-jp-obsidian shadow-gold-glow"
+                >
+                  Claim Drop →
+                </a>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Arrows */}
-        <button
-          aria-label="Previous Drop"
-          onClick={() => go(-1)}
-          className="absolute left-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-jp-gold-deep/50 bg-black/60 text-jp-gold backdrop-blur hover:bg-black/80 md:left-[-16px]"
-        >
-          <ChevronLeft size={18} />
-        </button>
-        <button
-          aria-label="Next Drop"
-          onClick={() => go(1)}
-          className="absolute left-[calc(50%-28px)] top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-jp-gold-deep/50 bg-black/60 text-jp-gold backdrop-blur hover:bg-black/80 md:left-auto md:right-[-16px]"
-        >
-          <ChevronRight size={18} />
-        </button>
+          {/* Arrows */}
+          <button
+            aria-label="Previous Drop"
+            onClick={() => goTo(index - 1)}
+            className="absolute left-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-jp-gold-deep/50 bg-black/60 text-jp-gold backdrop-blur hover:bg-black/80"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            aria-label="Next Drop"
+            onClick={() => goTo(index + 1)}
+            className="absolute right-0 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-jp-gold-deep/50 bg-black/60 text-jp-gold backdrop-blur hover:bg-black/80"
+          >
+            <ChevronRight size={18} />
+          </button>
 
-        {/* Dots */}
-        <div className="mt-6 flex items-center justify-center gap-2">
-          {SLIDES.map((_, i) => (
-            <button
-              key={i}
-              aria-label={`Go to Drop ${i + 1}`}
-              onClick={() => {
-                if (animating || i === index) return;
-                go(i > index ? 1 : -1);
-              }}
-              className={
-                "h-1.5 rounded-full transition-all " +
-                (i === index ? "w-8 bg-jp-gold" : "w-3 bg-jp-gold/30")
-              }
-            />
-          ))}
+          {/* Dots */}
+          <div className="mt-8 flex items-center justify-center gap-2">
+            {SLIDES.map((_, i) => (
+              <button
+                key={i}
+                aria-label={`Go to Drop ${i + 1}`}
+                onClick={() => goTo(i)}
+                className={
+                  "h-1.5 rounded-full transition-all " +
+                  (i === index ? "w-8 bg-jp-gold" : "w-3 bg-jp-gold/30")
+                }
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

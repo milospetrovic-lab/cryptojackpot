@@ -12,12 +12,12 @@ export function MagnetoField({ className }: Props) {
     <div ref={ref} className={cn("absolute inset-0", className)} aria-hidden>
       {inView ? (
         <iframe
-          src="/demos/magneto-field.html"
+          src="/demos/electric-field.html"
           loading="lazy"
           allowTransparency
           className="absolute inset-0 h-full w-full"
           style={{ border: 0, background: "transparent" }}
-          title="Magneto field"
+          title="Electric field"
         />
       ) : (
         <div
