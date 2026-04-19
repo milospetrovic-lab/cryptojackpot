@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { MagnetoField } from "@/components/three/MagnetoField";
-import { VaultCounter } from "@/components/jackpot/VaultCounter";
+import { ScrollStages } from "@/components/jackpot/ScrollStages";
 
 type Game = {
   name: string;
@@ -86,12 +86,7 @@ export default function GamesPage() {
         </div>
       </section>
 
-      {/* VAULT STRIP */}
-      <section className="relative mx-auto flex max-w-6xl justify-center px-8 py-10">
-        <VaultCounter variant="sticky" />
-      </section>
-
-      <div className="relative mx-auto max-w-6xl px-6 pb-24">
+      <div className="relative mx-auto max-w-6xl px-6 pt-12 pb-24">
         {/* TABS */}
         <div className="mb-10 flex flex-wrap justify-center gap-2">
           {(["slots", "jackpots", "originals"] as const).map((t) => (

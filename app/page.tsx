@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { MagnetoField } from "@/components/three/MagnetoField";
-import { VaultCounter } from "@/components/jackpot/VaultCounter";
 import { PromoBanner } from "@/components/jackpot/PromoBanner";
-import { ChipCascade } from "@/components/three/ChipCascade";
-import { DropsRow } from "@/components/jackpot/DropsRow";
+import { DropsCarousel } from "@/components/jackpot/DropsCarousel";
 import { RollCall } from "@/components/jackpot/RollCall";
 import { FAQ } from "@/components/jackpot/FAQ";
 import { CommunitySection } from "@/components/jackpot/CommunitySection";
@@ -68,24 +66,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* VAULT STRIP */}
-      <section className="relative border-y border-jp-gold-deep/20 bg-gradient-to-b from-black via-jp-charcoal to-jp-charcoal">
-        <div className="mx-auto max-w-6xl px-8 py-20">
-          <VaultCounter variant="hero" />
-        </div>
-      </section>
-
       {/* DEPOSIT TRIO — crypto deposit rails */}
       <DepositTrio />
 
       {/* BANNER — particles.js + crypto 3D render */}
       <BannerCard />
 
-      {/* DROPS */}
-      <DropsRow />
-
-      {/* CHIP CASCADE */}
-      <ChipCascade />
+      {/* DROPS — 3D carousel */}
+      <DropsCarousel />
 
       {/* CROWN TIERS PREVIEW */}
       <section className="relative mx-auto max-w-6xl px-8 py-24">

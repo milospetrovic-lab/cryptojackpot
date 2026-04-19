@@ -27,17 +27,17 @@
 
 @layer base {
   :root {
-    --color-light: #FFE88A;
+    --color-light: #F0FFA0;
     --color-dark: #0A0A0C;
     --color-light-lighter: #FFF5C0;
-    --color-light-darker: #D4AF37;
+    --color-light-darker: #B8DC4A;
     --color-dark-lighter: #1A1A1D;
     --color-dark-darker: #000000;
     --color-bg: var(--color-dark);
     --color-bg-alt: var(--color-dark-lighter);
     --color-text: var(--color-light);
     --color-text-muted: #A0A0A6;
-    --color-accent: #FFD700;
+    --color-accent: #E0FF57;
 
     --support-message-bg: var(--color-dark-darker);
     --support-message-text: var(--color-light-lighter);
@@ -104,7 +104,7 @@
   h1 {
     font-size: var(--ts-xxxl);
     margin-block-end: var(--space-lg);
-    background: linear-gradient(180deg, #FFE88A 0%, #FFD700 45%, #D4AF37 100%);
+    background: linear-gradient(180deg, #F0FFA0 0%, #E0FF57 45%, #B8DC4A 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
 
@@ -199,7 +199,7 @@
     overflow: hidden;
     position: relative;
     box-shadow: 0 30px 90px -20px rgba(0, 0, 0, 0.9),
-      0 0 0 1px rgba(212, 175, 55, 0.25) inset;
+      0 0 0 1px rgba(184, 220, 74, 0.25) inset;
   }
 
   .comparator-wrapper.flip-reverse { animation-name: comparator-3d-flip-reverse; }
@@ -270,8 +270,8 @@
 
     background: transparent;
     block-size: 100%;
-    border-inline-start: thin solid #FFD700;
-    box-shadow: 0 0 14px rgba(255, 215, 0, 0.65);
+    border-inline-start: thin solid #E0FF57;
+    box-shadow: 0 0 14px rgba(224, 255, 87, 0.65);
     grid-area: 1 / -1;
     inline-size: 1px;
     pointer-events: none;
@@ -302,9 +302,9 @@
   .label {
     backdrop-filter: blur(0.375rem);
     background: rgba(0, 0, 0, 0.55);
-    border: 1px solid rgba(212, 175, 55, 0.45);
+    border: 1px solid rgba(184, 220, 74, 0.45);
     border-radius: 999px;
-    color: #FFD700;
+    color: #E0FF57;
     font-family: var(--font-mono);
     font-size: var(--ts-xxs);
     font-weight: 600;
@@ -339,7 +339,7 @@
     letter-spacing: 0.12em;
     line-height: 1.1;
     margin: 0;
-    color: #FFE88A;
+    color: #F0FFA0;
     text-shadow: 0 2px 30px rgba(0, 0, 0, 0.8);
   }
 
@@ -350,13 +350,13 @@
     letter-spacing: 0.1em;
     line-height: 1.4;
     margin-top: 0.4rem;
-    color: #D4AF37;
+    color: #B8DC4A;
     text-transform: uppercase;
     text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
   }
 
   .comparison-percentage {
-    color: #FFD700;
+    color: #E0FF57;
     bottom: var(--space-md);
     font-family: var(--font-mono);
     font-size: var(--ts-md);
@@ -434,7 +434,7 @@
 
   .stage-indicator {
     appearance: none;
-    background: rgba(255, 215, 0, 0.28);
+    background: rgba(224, 255, 87, 0.28);
     border: none;
     border-radius: 0.25rem;
     cursor: pointer;
@@ -443,9 +443,9 @@
     transition: all 0.2s ease;
     width: 0.5rem;
   }
-  .stage-indicator:hover { background: rgba(255, 215, 0, 0.7); transform: scale(1.3); }
-  .stage-indicator.active { background: #FFD700; height: 1rem; }
-  .stage-indicator:focus-visible { outline: 2px solid #FFD700; outline-offset: 2px; }
+  .stage-indicator:hover { background: rgba(224, 255, 87, 0.7); transform: scale(1.3); }
+  .stage-indicator.active { background: #E0FF57; height: 1rem; }
+  .stage-indicator:focus-visible { outline: 2px solid #E0FF57; outline-offset: 2px; }
 
   @media (max-width: 48em) {
     .stage-nav {

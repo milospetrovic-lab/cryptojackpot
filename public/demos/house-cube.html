@@ -18,7 +18,7 @@
     --bg: #0A0A0C;
     --fg: #FAFAFA;
     --muted: #A0A0A6;
-    --accent: #FFD700;
+    --accent: #E0FF57;
     --accent-2: #C41E3A;
     --font-display: "Bebas Neue", sans-serif;
     --font-mono: "DM Mono", "JetBrains Mono", monospace;
@@ -57,11 +57,12 @@
   }
   #scroll_container { position: relative; z-index: 1; }
   section {
-    min-height: 100vh;
+    min-height: 55vh;
     display: flex;
     align-items: center;
-    padding: 6rem calc(5rem + var(--ui-inset)) 6rem 5rem;
+    padding: 3rem calc(5rem + var(--ui-inset)) 3rem 5rem;
   }
+  #s0 { min-height: 75vh; }
 }
 
 @layer cube {
@@ -81,11 +82,11 @@
     backface-visibility: hidden;
     background:
       radial-gradient(800px 420px at 50% -20%, rgba(196, 30, 58, 0.28), transparent 55%),
-      radial-gradient(600px 380px at 50% 120%, rgba(255, 215, 0, 0.2), transparent 55%),
-      repeating-linear-gradient(0deg, rgba(212, 175, 55, 0.05) 0, rgba(212, 175, 55, 0.05) 1px, transparent 1px, transparent 48px),
-      repeating-linear-gradient(90deg, rgba(212, 175, 55, 0.05) 0, rgba(212, 175, 55, 0.05) 1px, transparent 1px, transparent 48px),
+      radial-gradient(600px 380px at 50% 120%, rgba(224, 255, 87, 0.2), transparent 55%),
+      repeating-linear-gradient(0deg, rgba(184, 220, 74, 0.05) 0, rgba(184, 220, 74, 0.05) 1px, transparent 1px, transparent 48px),
+      repeating-linear-gradient(90deg, rgba(184, 220, 74, 0.05) 0, rgba(184, 220, 74, 0.05) 1px, transparent 1px, transparent 48px),
       #14100d;
-    border: 1px solid rgba(212, 175, 55, 0.25);
+    border: 1px solid rgba(184, 220, 74, 0.25);
   }
   .face .face-title {
     position: absolute;
@@ -94,7 +95,7 @@
     font-family: var(--font-display);
     font-size: clamp(2rem, 8vw, 5rem);
     letter-spacing: 0.06em;
-    color: rgba(255, 215, 0, 0.22);
+    color: rgba(224, 255, 87, 0.22);
     pointer-events: none;
     user-select: none;
   }
@@ -105,7 +106,7 @@
     font-family: var(--font-mono);
     font-size: 0.7rem;
     letter-spacing: 0.3em;
-    color: rgba(255, 215, 0, 0.55);
+    color: rgba(224, 255, 87, 0.55);
     pointer-events: none;
     user-select: none;
   }
@@ -310,11 +311,11 @@
     #scene_strip { display: none; }
     #face_caption { bottom: 80px; }
     section {
-      min-height: 120vh;
+      min-height: 72vh;
       align-items: flex-end;
-      padding: 0 1.25rem 2.5rem;
+      padding: 0 1.25rem 2rem;
     }
-    #s0 { min-height: 100vh; align-items: center; padding: 4rem 1.25rem; }
+    #s0 { min-height: 85vh; align-items: center; padding: 3rem 1.25rem; }
     .text-card, .text-card.right { max-width: 100%; padding: 1.5rem 1.25rem; }
   }
 }

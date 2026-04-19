@@ -15,13 +15,19 @@ const config: Config = {
           obsidian: "#000000",
           steel: "#1A1A1D",
           smoke: "#2A2A2E",
-          gold: "#FFD700",
-          "gold-deep": "#D4AF37",
-          "gold-warm": "#F0C948",
-          "gold-pale": "#FFE88A",
+          // Primary "gold" family — neon yellow-green (#E0FF57 base, contrast 18.61 on #0A0A0C)
+          gold: "#E0FF57",
+          "gold-deep": "#B8DC4A",
+          "gold-warm": "#F68838", // orange accent
+          "gold-pale": "#F0FFA0",
+          // Extended palette
+          orange: "#F68838",
+          mint: "#7DD8CD",
+          // Hit / strike
           ruby: "#C41E3A",
           molten: "#E63946",
           crimson: "#8B1A2B",
+          // System
           white: "#FAFAFA",
           mute: "#A0A0A6",
           dim: "#5A5A60",
@@ -30,24 +36,26 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["var(--font-cinzel)", "serif"],
+        display: ["var(--font-bebas)", "sans-serif"],
         body: ["var(--font-manrope)", "sans-serif"],
         mono: ["var(--font-jetbrains)", "monospace"],
         bebas: ["var(--font-bebas)", "sans-serif"],
+        cinzel: ["var(--font-cinzel)", "serif"],
       },
       letterSpacing: {
         vault: "0.25em",
       },
       boxShadow: {
-        "gold-glow": "0 0 24px rgba(255, 215, 0, 0.35)",
+        "gold-glow": "0 0 24px rgba(224, 255, 87, 0.38)",
         "ruby-glow": "0 0 32px rgba(196, 30, 58, 0.45)",
+        "mint-glow": "0 0 22px rgba(125, 216, 205, 0.35)",
         lounge: "0 30px 80px -20px rgba(0, 0, 0, 0.8)",
       },
       backgroundImage: {
         "molten-radial":
           "radial-gradient(1200px 600px at 50% 100%, rgba(196,30,58,0.18), transparent 70%)",
         "gold-sheen":
-          "linear-gradient(120deg, transparent 20%, rgba(255,232,138,0.55) 50%, transparent 80%)",
+          "linear-gradient(120deg, transparent 20%, rgba(240,255,160,0.55) 50%, transparent 80%)",
       },
       keyframes: {
         shimmer: {
@@ -59,9 +67,9 @@ const config: Config = {
           "50%": { transform: "translateY(-8px)" },
         },
         pulseRing: {
-          "0%": { boxShadow: "0 0 0 0 rgba(196,30,58,0.5)" },
-          "70%": { boxShadow: "0 0 0 18px rgba(196,30,58,0)" },
-          "100%": { boxShadow: "0 0 0 0 rgba(196,30,58,0)" },
+          "0%": { boxShadow: "0 0 0 0 rgba(224,255,87,0.55)" },
+          "70%": { boxShadow: "0 0 0 18px rgba(224,255,87,0)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(224,255,87,0)" },
         },
       },
       animation: {

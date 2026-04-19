@@ -72,13 +72,13 @@
       this.h = winH();
 
       // CryptoJackpot palette:
-      //   common small  → deep gold #D4AF37
+      //   common small  → deep gold #B8DC4A
       //   crimson spice → ruby #C41E3A
-      //   rare bright   → gold highlight #FFE88A
+      //   rare bright   → gold highlight #F0FFA0
       this.radius = random > 0.2 ? Math.random() * 1 : Math.random() * 3;
-      this.color = random > 0.2 ? "#D4AF37" : "#C41E3A";
+      this.color = random > 0.2 ? "#B8DC4A" : "#C41E3A";
       this.radius = random > 0.8 ? Math.random() * 2.2 : this.radius;
-      this.color = random > 0.8 ? "#FFE88A" : this.color;
+      this.color = random > 0.8 ? "#F0FFA0" : this.color;
     }
     calculateDistance(v1, v2) {
       const x = Math.abs(v1.x - v2.x);

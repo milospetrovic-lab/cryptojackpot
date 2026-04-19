@@ -23,8 +23,8 @@ function Chip({
     <svg width={size} height={size} viewBox="0 0 200 200">
       <defs>
         <radialGradient id={`${id}-face`} cx="50%" cy="45%" r="60%">
-          <stop offset="0%" stopColor="#FFE88A" />
-          <stop offset="55%" stopColor="#FFD700" />
+          <stop offset="0%" stopColor="#F0FFA0" />
+          <stop offset="55%" stopColor="#E0FF57" />
           <stop offset="100%" stopColor="#8B6B00" />
         </radialGradient>
         <linearGradient id={`${id}-edge`} x1="0" y1="0" x2="0" y2="1">
@@ -127,7 +127,7 @@ export function ChipCascade() {
         style={{
           opacity: 0.1,
           background:
-            "radial-gradient(900px 600px at 50% 110%, rgba(255,215,0,0.28), transparent 60%), radial-gradient(1200px 700px at 50% 130%, rgba(196,30,58,0.4), transparent 65%)",
+            "radial-gradient(900px 600px at 50% 110%, rgba(224,255,87,0.28), transparent 60%), radial-gradient(1200px 700px at 50% 130%, rgba(196,30,58,0.4), transparent 65%)",
           filter: "blur(30px)",
         }}
       />

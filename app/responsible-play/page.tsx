@@ -13,7 +13,7 @@ export default function ResponsiblePlayPage() {
         src="/demos/house-cube.html"
         title="House Rules — the Cube"
         className="block min-h-[100vh] w-full"
-        style={{ border: 0, height: "calc(100svh * 6)" }}
+        style={{ border: 0, height: "calc(100svh * 3.7)" }}
       />
     </div>
   );

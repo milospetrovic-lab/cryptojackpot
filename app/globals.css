@@ -7,10 +7,13 @@
   --jp-obsidian: #000000;
   --jp-steel: #1a1a1d;
   --jp-smoke: #2a2a2e;
-  --jp-gold: #ffd700;
-  --jp-gold-deep: #d4af37;
-  --jp-gold-warm: #f0c948;
-  --jp-gold-pale: #ffe88a;
+  /* Primary neon yellow-green (replaces #FFD700) — contrast 18.61 on charcoal */
+  --jp-gold: #e0ff57;
+  --jp-gold-deep: #b8dc4a;
+  --jp-gold-warm: #f68838;
+  --jp-gold-pale: #f0ffa0;
+  --jp-orange: #f68838;
+  --jp-mint: #7dd8cd;
   --jp-ruby: #c41e3a;
   --jp-molten: #e63946;
   --jp-crimson: #8b1a2b;
@@ -39,7 +42,7 @@ body {
   color: var(--jp-obsidian);
 }
 
-/* Scrollbar tuned to the lounge */
+/* Scrollbar tuned to the neon lounge */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb {
@@ -57,9 +60,11 @@ body {
     color: var(--jp-gold);
   }
   .display {
-    font-family: var(--font-cinzel);
-    font-weight: 700;
-    letter-spacing: 0.18em;
+    /* Bebas Neue is now the display face across the brand */
+    font-family: var(--font-bebas), sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   .tabular {
     font-family: var(--font-jetbrains);
@@ -71,9 +76,21 @@ body {
     background-clip: text;
     color: transparent;
   }
+  .mint-text {
+    background: linear-gradient(180deg, #c8f2ec 0%, var(--jp-mint) 55%, #4ca99f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .orange-text {
+    background: linear-gradient(180deg, #ffc68f 0%, var(--jp-orange) 55%, #bf5b1c 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
   .lounge-card {
     background: linear-gradient(180deg, rgba(26,26,29,0.85), rgba(10,10,12,0.9));
-    border: 1px solid rgba(212,175,55,0.18);
+    border: 1px solid rgba(184, 220, 74, 0.18);
     backdrop-filter: blur(14px);
   }
   .gold-divider {
@@ -92,7 +109,6 @@ body {
   }
 }
 
-/* Respect reduced motion globally */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

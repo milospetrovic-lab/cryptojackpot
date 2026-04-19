@@ -30,8 +30,8 @@ export const TIERS: TierSpec[] = [
   {
     id: "gold",
     name: "Gold Chip",
-    chip: "#FFD700",
-    edge: "#8B6B00",
+    chip: "#E0FF57",
+    edge: "#5A7012",
     unlock: "30 session days · $5,000 total Stake",
     benefit: "10% Retainer · exclusive Drops · priority Concierge",
     retainer: "10%",

@@ -57,7 +57,7 @@ const PHASES: Phase[] = [
       "Live Hit ticker + site-wide ringing",
       "Cross-chain deposits (BTC · ETH · LTC · SOL)",
     ],
-    accent: "#FFE88A",
+    accent: "#F0FFA0",
     status: "Soon",
   },
 ];
@@ -128,7 +128,7 @@ export function Roadmap() {
           className="rm-spine absolute left-6 top-0 hidden h-full w-px md:left-1/2 md:block"
           style={{
             background:
-              "linear-gradient(180deg, rgba(212,175,55,0.7), rgba(196,30,58,0.5) 50%, rgba(255,232,138,0.7))",
+              "linear-gradient(180deg, rgba(184,220,74,0.7), rgba(196,30,58,0.5) 50%, rgba(240,255,160,0.7))",
           }}
         />
 

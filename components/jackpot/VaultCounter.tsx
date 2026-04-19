@@ -83,7 +83,7 @@ export function VaultCounter({ variant = "hero", className, initial = 142.8473 }
       <div
         className={cn(
           "display tabular gold-text select-none text-[clamp(56px,10vw,148px)] leading-none",
-          ringing && "!text-transparent [background:linear-gradient(180deg,#FFE88A,#C41E3A)] [-webkit-background-clip:text] [background-clip:text]"
+          ringing && "!text-transparent [background:linear-gradient(180deg,#F0FFA0,#C41E3A)] [-webkit-background-clip:text] [background-clip:text]"
         )}
         style={{ letterSpacing: "0.04em" }}
       >

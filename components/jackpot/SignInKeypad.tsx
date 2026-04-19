@@ -124,14 +124,14 @@ export function SignInKeypad() {
                 <stop offset="100%" stopColor="#000" />
               </linearGradient>
               <radialGradient id="sk-glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="rgba(255,215,0,0.35)" />
-                <stop offset="100%" stopColor="rgba(255,215,0,0)" />
+                <stop offset="0%" stopColor="rgba(224,255,87,0.35)" />
+                <stop offset="100%" stopColor="rgba(224,255,87,0)" />
               </radialGradient>
             </defs>
             <path
               d="M20 250 Q 20 200 60 200 L 340 200 Q 380 200 380 250 L 380 290 Q 380 310 360 310 L 40 310 Q 20 310 20 290 Z"
               fill="url(#sk-base)"
-              stroke="#D4AF37"
+              stroke="#B8DC4A"
               strokeOpacity="0.35"
               strokeWidth="1"
             />
@@ -182,8 +182,8 @@ function KeyBtn({
             x2="0"
             y2="1"
           >
-            <stop offset="0%" stopColor="#FFE88A" />
-            <stop offset="55%" stopColor="#FFD700" />
+            <stop offset="0%" stopColor="#F0FFA0" />
+            <stop offset="55%" stopColor="#E0FF57" />
             <stop offset="100%" stopColor="#8B6B00" />
           </linearGradient>
         </defs>

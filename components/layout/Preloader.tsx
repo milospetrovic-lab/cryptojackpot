@@ -95,7 +95,7 @@ export function Preloader() {
         height="140"
         viewBox="0 0 200 200"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ filter: "url(#warp) drop-shadow(0 0 24px rgba(255,215,0,0.55))" }}
+        style={{ filter: "url(#warp) drop-shadow(0 0 24px rgba(224,255,87,0.55))" }}
       >
         <defs>
           <filter id="warp" x="-20%" y="-20%" width="140%" height="140%">
@@ -115,8 +115,8 @@ export function Preloader() {
             <feDisplacementMap in="SourceGraphic" scale="4" />
           </filter>
           <radialGradient id="chipFace" cx="50%" cy="45%" r="60%">
-            <stop offset="0%" stopColor="#FFE88A" />
-            <stop offset="55%" stopColor="#FFD700" />
+            <stop offset="0%" stopColor="#F0FFA0" />
+            <stop offset="55%" stopColor="#E0FF57" />
             <stop offset="100%" stopColor="#8B6B00" />
           </radialGradient>
           <linearGradient id="chipEdge" x1="0" y1="0" x2="0" y2="1">
@@ -166,7 +166,7 @@ export function Preloader() {
           className="h-full w-0"
           style={{
             background:
-              "linear-gradient(90deg, #FFD700 0%, #F0C948 55%, #C41E3A 100%)",
+              "linear-gradient(90deg, #E0FF57 0%, #F68838 55%, #C41E3A 100%)",
           }}
         />
       </div>

@@ -63,7 +63,7 @@
     size = Math.min(220, Math.max(44, Math.floor((target / baseW) * size)));
     ctx.font = `700 ${size}px "Cinzel", "Montserrat", serif`;
     // Faint gold ghost — becomes invisible as particles paint over it.
-    ctx.fillStyle = "rgba(255, 215, 0, 0.18)";
+    ctx.fillStyle = "rgba(224, 255, 87, 0.18)";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     const lineheight = Math.floor(size * 0.95);
@@ -94,7 +94,7 @@
       this.w = winW();
       this.h = winH();
       this.radius = 0.5 + Math.random() * 20;
-      this.color = this.radius > 5 ? "#FFD700" : "#C41E3A";
+      this.color = this.radius > 5 ? "#E0FF57" : "#C41E3A";
     }
     render() {
       this.canvas.beginPath();
