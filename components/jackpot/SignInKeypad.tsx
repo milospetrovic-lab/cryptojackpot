@@ -1,25 +1,31 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useEffect, useRef, useState, FormEvent } from "react";
 import { gsap } from "gsap";
-import { useEffect, useRef } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+const BASE_SRC =
+  "https://assets.codepen.io/605876/keypad-base.png?format=auto&quality=86";
+const SINGLE_SRC =
+  "https://assets.codepen.io/605876/keypad-single.png?format=auto&quality=86";
+const DOUBLE_SRC =
+  "https://assets.codepen.io/605876/keypad-double.png?format=auto&quality=86";
+
 /**
- * SignInKeypad — simplified homage to Jhey's codepen keypad, rebuilt in SVG
- * so we don't depend on external PNG assets. Three gold buttons. Submitting
- * the form "detonates" the pad — GSAP lifts each button up and fades it
- * before bouncing them back.
+ * SignInKeypad — Jhey's keypad (credit: @jh3yy / codepen 605876) re-sewn
+ * into a CryptoJackpot email-capture. Uses the real PNG assets with
+ * CSS clip-path + hue-rotate filter for the OK / GO / ENTER keys. Each
+ * key is a button; ENTER submits the form.
  */
 export function SignInKeypad() {
   const [email, setEmail] = useState("");
-  const [exploded, setExploded] = useState(false);
+  const [sent, setSent] = useState(false);
   const rootRef = useRef<HTMLElement>(null);
-  const padRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -31,7 +37,7 @@ export function SignInKeypad() {
         ease: "power3.out",
         scrollTrigger: { trigger: rootRef.current, start: "top 75%" },
       });
-      gsap.from(padRef.current, {
+      gsap.from(".keypad", {
         opacity: 0,
         x: 80,
         duration: 0.9,
@@ -42,27 +48,22 @@ export function SignInKeypad() {
     return () => ctx.revert();
   }, []);
 
-  function submit(e: FormEvent) {
-    e.preventDefault();
-    if (!email) return;
-    setExploded(true);
-    if (padRef.current) {
-      gsap.to(padRef.current.querySelectorAll(".sk-key"), {
-        y: (i) => [-40, -60, -30][i],
-        duration: 0.4,
-        stagger: 0.05,
-        ease: "power2.out",
-        onComplete: () => {
-          gsap.to(padRef.current!.querySelectorAll(".sk-key"), {
-            y: 0,
-            duration: 0.6,
-            stagger: 0.05,
-            ease: "elastic.out(1, 0.5)",
-          });
-        },
-      });
+  function pressKey(id: "ok" | "go" | "enter") {
+    const el = rootRef.current?.querySelector(`#sk-${id}`) as HTMLElement | null;
+    if (!el) return;
+    el.setAttribute("data-pressed", "true");
+    setTimeout(() => el.removeAttribute("data-pressed"), 150);
+  }
+
+  function submit(e?: FormEvent) {
+    if (e) e.preventDefault();
+    if (!email) {
+      formRef.current?.reportValidity();
+      return;
     }
-    setTimeout(() => setExploded(false), 1800);
+    pressKey("enter");
+    setSent(true);
+    setTimeout(() => setSent(false), 2400);
   }
 
   return (
@@ -82,11 +83,14 @@ export function SignInKeypad() {
           </h2>
           <p className="mt-5 max-w-md text-sm leading-relaxed text-jp-mute md:text-base">
             Drop an email. We'll send you a direct line to the Concierge and
-            your first Opening Hand code. No passwords until you want one. No
-            KYC until you stake above 1 BTC.
+            your first Opening Hand code. No passwords until you want one.
           </p>
 
-          <form onSubmit={submit} className="mt-8 flex max-w-md flex-wrap gap-2">
+          <form
+            ref={formRef}
+            onSubmit={submit}
+            className="mt-8 flex max-w-md flex-wrap gap-2"
+          >
             <input
               type="email"
               required
@@ -97,138 +101,230 @@ export function SignInKeypad() {
             />
             <button
               type="submit"
-              className="rounded-full bg-gradient-to-b from-jp-gold-pale to-jp-gold px-6 py-3 text-[11px] font-bold uppercase tracking-[0.22em] text-jp-obsidian shadow-gold-glow"
+              className="rounded-full bg-gradient-to-b from-jp-gold-pale via-jp-gold to-jp-gold-deep px-6 py-3 text-[11px] font-bold uppercase tracking-[0.22em] text-jp-obsidian shadow-gold-glow"
             >
-              {exploded ? "Sent" : "Sign Up"}
+              {sent ? "Sent" : "Sign Up"}
             </button>
           </form>
           <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-jp-dim">
-            Age 18+ only · jurisdictions apply · House Rules in-nav
+            18+ · or tap <span className="text-jp-gold">ENTER</span> on the
+            pad — either works
           </p>
         </div>
 
-        {/* Keypad */}
-        <div
-          ref={padRef}
-          className="relative mx-auto aspect-[400/310] w-full max-w-[380px]"
-        >
-          {/* Base — stylised casino console */}
-          <svg
-            viewBox="0 0 400 310"
-            className="absolute inset-0 h-full w-full"
-            aria-hidden
-          >
-            <defs>
-              <linearGradient id="sk-base" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#1A1A1D" />
-                <stop offset="100%" stopColor="#000" />
-              </linearGradient>
-              <radialGradient id="sk-glow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="rgba(224,255,87,0.35)" />
-                <stop offset="100%" stopColor="rgba(224,255,87,0)" />
-              </radialGradient>
-            </defs>
-            <path
-              d="M20 250 Q 20 200 60 200 L 340 200 Q 380 200 380 250 L 380 290 Q 380 310 360 310 L 40 310 Q 20 310 20 290 Z"
-              fill="url(#sk-base)"
-              stroke="#B8DC4A"
-              strokeOpacity="0.35"
-              strokeWidth="1"
-            />
-            <rect x="60" y="215" width="280" height="20" rx="4" fill="#0A0A0C" />
-            <ellipse cx="200" cy="150" rx="180" ry="60" fill="url(#sk-glow)" />
-          </svg>
+        {/* Physical keypad — same structure as the Jhey pen */}
+        <div className="keypad">
+          <div className="keypad__base">
+            <img src={BASE_SRC} alt="" aria-hidden draggable={false} />
+          </div>
 
-          {/* Three keys */}
-          <KeyBtn
-            className="sk-key absolute left-[14%] top-[8%] h-[34%] w-[36%]"
-            label="OK"
-          />
-          <KeyBtn
-            className="sk-key absolute right-[10%] top-[22%] h-[34%] w-[36%]"
-            label="GO"
-          />
-          <KeyBtn
-            className="sk-key absolute left-[20%] top-[48%] h-[34%] w-[60%]"
-            label="ENTER"
-            wide
-          />
+          {/* OK — orange, upper-right-ish (keypad__single--left sits higher) */}
+          <button
+            id="sk-ok"
+            type="button"
+            aria-label="OK"
+            onClick={() => pressKey("ok")}
+            className="key keypad__single keypad__single--left"
+            style={
+              {
+                // base PNG is already orange — keep it, boost saturation slightly
+                ["--hue" as any]: 0,
+                ["--saturate" as any]: 1.05,
+                ["--brightness" as any]: 1,
+              } as React.CSSProperties
+            }
+          >
+            <span className="key__mask">
+              <span className="key__content">
+                <span className="key__text">ok</span>
+                <img src={SINGLE_SRC} alt="" aria-hidden draggable={false} />
+              </span>
+            </span>
+          </button>
+
+          {/* GO — gray, lower-right */}
+          <button
+            id="sk-go"
+            type="button"
+            aria-label="GO"
+            onClick={() => pressKey("go")}
+            className="key keypad__single"
+            style={
+              {
+                // desaturate the orange PNG to a neutral gray
+                ["--hue" as any]: 180,
+                ["--saturate" as any]: 0.05,
+                ["--brightness" as any]: 1.15,
+              } as React.CSSProperties
+            }
+          >
+            <span className="key__mask">
+              <span className="key__content">
+                <span className="key__text">go</span>
+                <img src={SINGLE_SRC} alt="" aria-hidden draggable={false} />
+              </span>
+            </span>
+          </button>
+
+          {/* ENTER — wide, bottom-left, black. This one submits the form. */}
+          <button
+            id="sk-enter"
+            type="button"
+            aria-label="ENTER"
+            onClick={() => submit()}
+            className="key keypad__double"
+            style={
+              {
+                // kill saturation, drop brightness — the key reads black
+                ["--hue" as any]: 0,
+                ["--saturate" as any]: 0,
+                ["--brightness" as any]: 0.16,
+              } as React.CSSProperties
+            }
+          >
+            <span className="key__mask">
+              <span className="key__content">
+                <span className="key__text">ENTER</span>
+                <img src={DOUBLE_SRC} alt="" aria-hidden draggable={false} />
+              </span>
+            </span>
+          </button>
         </div>
       </div>
-    </section>
-  );
-}
 
-function KeyBtn({
-  className,
-  label,
-  wide,
-}: {
-  className?: string;
-  label: string;
-  wide?: boolean;
-}) {
-  return (
-    <button className={className} type="button" aria-label={label}>
-      <svg
-        viewBox={wide ? "0 0 200 100" : "0 0 100 100"}
-        className="h-full w-full"
-      >
-        <defs>
-          <linearGradient
-            id={`sk-key-${label}`}
-            x1="0"
-            y1="0"
-            x2="0"
-            y2="1"
-          >
-            <stop offset="0%" stopColor="#F0FFA0" />
-            <stop offset="55%" stopColor="#E0FF57" />
-            <stop offset="100%" stopColor="#8B6B00" />
-          </linearGradient>
-        </defs>
-        {wide ? (
-          <>
-            <path
-              d="M30 15 L 170 15 Q 190 15 190 35 L 190 75 Q 190 95 170 95 L 30 95 Q 10 95 10 75 L 10 35 Q 10 15 30 15 Z"
-              fill={`url(#sk-key-${label})`}
-              stroke="#8B6B00"
-              strokeWidth="1.5"
-            />
-            <text
-              x="100"
-              y="62"
-              textAnchor="middle"
-              fontFamily="Bebas Neue, sans-serif"
-              fontSize="28"
-              letterSpacing="4"
-              fill="#1A1A1D"
-            >
-              {label}
-            </text>
-          </>
-        ) : (
-          <>
-            <path
-              d="M20 10 L 80 10 Q 95 10 95 25 L 95 75 Q 95 90 80 90 L 20 90 Q 5 90 5 75 L 5 25 Q 5 10 20 10 Z"
-              fill={`url(#sk-key-${label})`}
-              stroke="#8B6B00"
-              strokeWidth="1.5"
-            />
-            <text
-              x="50"
-              y="58"
-              textAnchor="middle"
-              fontFamily="Bebas Neue, sans-serif"
-              fontSize="28"
-              letterSpacing="3"
-              fill="#1A1A1D"
-            >
-              {label}
-            </text>
-          </>
-        )}
-      </svg>
-    </button>
+      <style>{`
+        .keypad {
+          --travel: 20;
+          position: relative;
+          aspect-ratio: 400 / 310;
+          width: clamp(280px, 35vw, 400px);
+          margin-inline: auto;
+          display: flex;
+          place-items: center;
+          -webkit-tap-highlight-color: transparent;
+          transition-property: translate, transform;
+          transition-duration: 0.26s;
+          transition-timing-function: ease-out;
+          transform-style: preserve-3d;
+        }
+        .keypad .key {
+          transform-style: preserve-3d;
+          border: 0;
+          background: transparent;
+          padding: 0;
+          cursor: pointer;
+          outline: none;
+        }
+        .keypad .key[data-pressed="true"] .key__content,
+        .keypad .key:active .key__content {
+          translate: 0 calc(var(--travel) * 1%);
+        }
+        .keypad .key__content {
+          width: 100%;
+          height: 100%;
+          display: inline-block;
+          transition: translate 0.12s ease-out;
+          container-type: inline-size;
+        }
+        .keypad .key__mask {
+          width: 100%;
+          height: 100%;
+          display: inline-block;
+        }
+
+        /* Single key — orange/gray, silhouette via clip-path + PNG mask */
+        .keypad .keypad__single {
+          position: absolute;
+          width: 40.5%;
+          left: 54%;
+          bottom: 36%;
+          height: 46%;
+          clip-path: polygon(
+            0 0, 54% 0, 89% 24%, 100% 70%, 54% 100%,
+            46% 100%, 0 69%, 12% 23%, 47% 0%
+          );
+          -webkit-mask: url(${SINGLE_SRC}) 50% 50% / 100% 100%;
+          mask: url(${SINGLE_SRC}) 50% 50% / 100% 100%;
+        }
+        .keypad .keypad__single.keypad__single--left {
+          left: 29.3%;
+          bottom: 54.2%;
+        }
+        .keypad .keypad__single img {
+          top: 0;
+          width: 96%;
+          position: absolute;
+          left: 50%;
+          translate: -50% 1%;
+          opacity: 1;
+        }
+
+        /* Wide ENTER key */
+        .keypad .keypad__double {
+          position: absolute;
+          width: 64%;
+          height: 65%;
+          left: 6%;
+          bottom: 17.85%;
+          background: hsl(10 100% 50% / 0);
+          clip-path: polygon(
+            34% 0, 93% 44%, 101% 78%, 71% 100%, 66% 100%,
+            0 52%, 0 44%, 7% 17%, 30% 0
+          );
+          -webkit-mask: url(${DOUBLE_SRC}) 50% 50% / 100% 100%;
+          mask: url(${DOUBLE_SRC}) 50% 50% / 100% 100%;
+        }
+        .keypad .keypad__double img {
+          top: 0;
+          width: 99%;
+          position: absolute;
+          left: 50%;
+          translate: -50% 1%;
+          opacity: 1;
+        }
+
+        /* Text laid flat on the 3D key top */
+        .keypad .key__text {
+          height: 46%;
+          width: 86%;
+          position: absolute;
+          font-family: var(--font-bebas), sans-serif;
+          font-weight: 400;
+          letter-spacing: 0.05em;
+          font-size: 12cqi;
+          z-index: 21;
+          top: 5%;
+          left: 0;
+          color: hsl(0 0% 94%);
+          translate: 8% 10%;
+          transform: rotateX(36deg) rotateY(45deg) rotateX(-90deg);
+          text-align: left;
+          padding: 1ch;
+        }
+        .keypad .keypad__single .key__text {
+          width: 52%;
+          height: 62%;
+          font-size: 18cqi;
+          translate: 45% -16%;
+        }
+
+        /* Hue/brightness recolor applied to the PNG under the mask */
+        .keypad .key img {
+          filter: hue-rotate(calc(var(--hue, 0) * 1deg))
+            saturate(var(--saturate, 1))
+            brightness(var(--brightness, 1));
+        }
+
+        .keypad .keypad__base {
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+        }
+        .keypad img {
+          transition: translate 0.12s ease-out;
+          width: 100%;
+        }
+      `}</style>
+    </section>
   );
 }
