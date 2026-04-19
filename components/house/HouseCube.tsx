@@ -114,130 +114,6 @@ export function HouseCube() {
   const progFillRef = useRef<HTMLDivElement>(null);
   const capNumRef = useRef<HTMLDivElement>(null);
   const capNameRef = useRef<HTMLDivElement>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // Electric particles layer (behind the cube)
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const isDesktop = window.innerWidth >= 1024;
-    // Many small dots, slow bolts — matches the hero field.
-    const NODES = isDesktop ? 34 : 16;
-    const MAX_LINK = isDesktop ? 220 : 180;
-    const BOLT_BASE_PROB = 0.006;
-    const BOLT_PROX_BONUS = 0.04;
-    const PALETTE_BOLT = [
-      "rgba(125, 216, 205, 0.88)",
-      "rgba(224, 255, 87, 0.9)",
-      "rgba(246, 136, 56, 0.88)",
-    ];
-    const PALETTE_DOT = ["#7DD8CD", "#E0FF57", "#F68838"];
-    let raf = 0;
-
-    function fit() {
-      const r = canvas!.getBoundingClientRect();
-      canvas!.width = r.width;
-      canvas!.height = r.height;
-    }
-    fit();
-    const ro = new ResizeObserver(fit);
-    ro.observe(canvas);
-
-    const nodes = Array.from({ length: NODES }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.18,
-      vy: (Math.random() - 0.5) * 0.18,
-      seed: Math.random() * Math.PI * 2,
-      color: Math.floor(Math.random() * 3), // palette index
-    }));
-
-    function bolt(
-      ax: number,
-      ay: number,
-      bx: number,
-      by: number,
-      depth: number,
-      color: string
-    ) {
-      if (depth <= 0) {
-        ctx!.beginPath();
-        ctx!.moveTo(ax, ay);
-        ctx!.lineTo(bx, by);
-        ctx!.strokeStyle = color;
-        ctx!.lineWidth = 1;
-        ctx!.stroke();
-        return;
-      }
-      const mx = (ax + bx) / 2 + (Math.random() - 0.5) * (28 / depth);
-      const my = (ay + by) / 2 + (Math.random() - 0.5) * (28 / depth);
-      bolt(ax, ay, mx, my, depth - 1, color);
-      bolt(mx, my, bx, by, depth - 1, color);
-      if (depth > 1 && Math.random() < 0.22) {
-        bolt(
-          mx,
-          my,
-          mx + (Math.random() - 0.5) * 40,
-          my + (Math.random() - 0.5) * 40,
-          depth - 2,
-          color
-        );
-      }
-    }
-
-    function frame() {
-      ctx!.globalCompositeOperation = "destination-out";
-      ctx!.globalAlpha = 0.16;
-      ctx!.fillStyle = "#000";
-      ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
-      ctx!.globalAlpha = 1;
-      ctx!.globalCompositeOperation = "source-over";
-
-      for (const n of nodes) {
-        n.x += n.vx + Math.cos((n.seed += 0.005)) * 0.08;
-        n.y += n.vy + Math.sin(n.seed * 1.3) * 0.08;
-        if (n.x < 0 || n.x > canvas!.width) n.vx *= -1;
-        if (n.y < 0 || n.y > canvas!.height) n.vy *= -1;
-      }
-
-      ctx!.shadowBlur = 8;
-      for (const n of nodes) {
-        const c = PALETTE_DOT[n.color];
-        ctx!.shadowColor = c;
-        ctx!.fillStyle = c;
-        ctx!.beginPath();
-        ctx!.arc(n.x, n.y, 1.2, 0, Math.PI * 2);
-        ctx!.fill();
-      }
-      ctx!.shadowBlur = 0;
-
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
-          const d = Math.hypot(dx, dy);
-          if (d > MAX_LINK) continue;
-          if (Math.random() > BOLT_BASE_PROB + (1 - d / MAX_LINK) * BOLT_PROX_BONUS) continue;
-          const color = PALETTE_BOLT[Math.floor(Math.random() * PALETTE_BOLT.length)];
-          ctx!.shadowColor = color;
-          ctx!.shadowBlur = 14;
-          bolt(nodes[i].x, nodes[i].y, nodes[j].x, nodes[j].y, 3, color);
-          ctx!.shadowBlur = 0;
-        }
-      }
-      raf = requestAnimationFrame(frame);
-    }
-    raf = requestAnimationFrame(frame);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-    };
-  }, []);
 
   // Scroll-driven cube rotation + HUD
   useEffect(() => {
@@ -246,7 +122,6 @@ export function HouseCube() {
     const sections = Array.from(
       root.querySelectorAll<HTMLElement>(".hc-section")
     );
-    const dots = Array.from(root.querySelectorAll<HTMLAnchorElement>(".hc-dot"));
     const N = SCENES.length;
 
     let maxScroll = 1;
@@ -310,7 +185,6 @@ export function HouseCube() {
         if (capNumRef.current)
           capNumRef.current.textContent = String(si + 1).padStart(2, "0");
         if (capNameRef.current) capNameRef.current.textContent = name;
-        dots.forEach((d, i) => d.classList.toggle("hc-dot-active", i === si));
       }
     }
 
@@ -338,23 +212,7 @@ export function HouseCube() {
 
   return (
     <div ref={rootRef} className="hc-root relative">
-      {/* Electric particle canvas — concentrated in the center where the cube
-          sits. Radial mask fades the field out toward the edges so it reads
-          as lightning trapped inside the cube rather than wallpaper. */}
-      <canvas
-        ref={canvasRef}
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-[1]"
-        style={{
-          mixBlendMode: "screen",
-          maskImage:
-            "radial-gradient(closest-side at 50% 50%, #000 40%, rgba(0,0,0,0.5) 65%, transparent 92%)",
-          WebkitMaskImage:
-            "radial-gradient(closest-side at 50% 50%, #000 40%, rgba(0,0,0,0.5) 65%, transparent 92%)",
-        }}
-      />
-
-      {/* 3D scene + cube */}
+      {/* 3D scene + cube (no electric canvas behind) */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-[2] flex items-center justify-center"
@@ -374,6 +232,24 @@ export function HouseCube() {
           {SCENES.map((s) => (
             <CubeFace key={s.face} face={s.face} num={s.num} title={s.title} />
           ))}
+
+          {/* Hero coin floating at the cube's center, slow continuous spin.
+              Sits at translateZ(0) so it's the geometric middle of the cube;
+              the translucent faces show it through from every angle. */}
+          <img
+            src="/images/hero/center-coin-hero.png"
+            alt=""
+            aria-hidden
+            draggable={false}
+            className="hc-coin pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none object-contain"
+            style={{
+              width: "40%",
+              height: "40%",
+              filter:
+                "drop-shadow(0 0 24px rgba(224,255,87,0.45)) drop-shadow(0 0 48px rgba(246,136,56,0.22))",
+              transform: "translate(-50%, -50%) translateZ(0)",
+            }}
+          />
         </div>
       </div>
 
@@ -394,23 +270,6 @@ export function HouseCube() {
         >
           DESCEND
         </div>
-      </div>
-
-      {/* Scene dot strip (desktop) */}
-      <div
-        ref={stripRef}
-        className="pointer-events-auto fixed left-5 top-1/2 z-[10] hidden -translate-y-1/2 flex-col gap-3 md:flex"
-      >
-        {SCENES.map((s, i) => (
-          <a
-            key={s.id}
-            href={`#${s.id}`}
-            className={
-              "hc-dot block h-1 w-1 rounded-full bg-jp-mute transition-all " +
-              (i === 0 ? "hc-dot-active" : "")
-            }
-          />
-        ))}
       </div>
 
       {/* Face caption */}
@@ -498,9 +357,16 @@ export function HouseCube() {
       </div>
 
       <style>{`
-        .hc-dot-active {
-          background: #E0FF57;
-          transform: scale(1.8);
+        .hc-coin {
+          animation: hc-coin-spin 14s linear infinite;
+          transform-origin: center;
+        }
+        @keyframes hc-coin-spin {
+          from { transform: translate(-50%, -50%) translateZ(0) rotateY(0deg); }
+          to   { transform: translate(-50%, -50%) translateZ(0) rotateY(360deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hc-coin { animation: none; }
         }
       `}</style>
     </div>

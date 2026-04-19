@@ -106,13 +106,13 @@ export function CommunityAccordion() {
       const closest = (target as HTMLElement | null)?.closest("li");
       if (!closest) return;
       const active = items.indexOf(closest);
-      const cols = items
+      const rows = items
         .map((it, i) => {
           it.dataset.active = i === active ? "true" : "false";
           return i === active ? "10fr" : "1fr";
         })
         .join(" ");
-      list.style.setProperty("grid-template-columns", cols);
+      list.style.setProperty("grid-template-rows", rows);
     };
 
     const onPointer = (e: PointerEvent) => setIndex(e.target);
@@ -165,7 +165,7 @@ export function CommunityAccordion() {
       <style>{`
         .comm-grid {
           --gap: 10px;
-          --base: clamp(2.2rem, 8cqi, 76px);
+          --base: clamp(3rem, 10cqi, 76px);
           --speed: 0.6s;
           --easing: linear(
             0 0%, 0.1538 4.09%, 0.2926 8.29%, 0.4173 12.63%,
@@ -175,20 +175,23 @@ export function CommunityAccordion() {
           );
           container-type: inline-size;
           display: grid;
-          grid-template-columns: 10fr 1fr 1fr 1fr 1fr 1fr;
+          /* VERTICAL stacking — rows expand instead of columns */
+          grid-template-rows: 10fr 1fr 1fr 1fr 1fr 1fr;
+          grid-template-columns: 1fr;
           gap: var(--gap);
           list-style: none;
           padding: 0;
           margin: 0 auto;
           width: 100%;
-          /* enlarged vs the promotions grid */
-          height: clamp(380px, 62dvh, 620px);
-          transition: grid-template-columns var(--speed) var(--easing);
+          max-width: 880px;
+          /* tall so each row has breathing room when expanded */
+          min-height: clamp(640px, 100dvh, 1040px);
+          transition: grid-template-rows var(--speed) var(--easing);
         }
         .comm-item {
           position: relative;
           overflow: hidden;
-          min-width: var(--base);
+          min-height: var(--base);
           border-radius: 16px;
           border: 1px solid rgba(184, 220, 74, 0.25);
           transition: box-shadow calc(var(--speed) * 1.2) var(--easing),
@@ -202,62 +205,69 @@ export function CommunityAccordion() {
             0 28px 70px -30px rgba(0, 0, 0, 0.95);
         }
         .comm-item article {
-          width: calc(var(--article-width, 820) * 1px);
           height: 100%;
+          width: 100%;
           position: absolute;
           inset: 0;
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
           gap: 0.9rem;
-          padding-inline: calc(var(--base) * 0.5 - 9px);
-          padding-bottom: 1.2rem;
+          padding: calc(var(--base) * 0.5 - 8px) 1.5rem 1.25rem;
           overflow: hidden;
         }
+        /* Collapsed rows: title sits horizontally at top, no rotation needed */
         .comm-item article h3 {
           position: absolute;
-          top: 1.15rem;
-          left: calc(var(--base) * 0.5);
-          transform-origin: 0 50%;
-          rotate: 90deg;
+          top: 50%;
+          left: 1.5rem;
+          translate: 0 -50%;
           margin: 0;
           font-family: var(--font-bebas), sans-serif;
-          font-size: 1.15rem;
-          letter-spacing: 0.24em;
+          font-size: 1.35rem;
+          letter-spacing: 0.26em;
           text-transform: uppercase;
           color: #F0FFA0;
           white-space: nowrap;
           opacity: 0.7;
-          transition: opacity calc(var(--speed) * 1.2) var(--easing);
+          transition: opacity calc(var(--speed) * 1.2) var(--easing),
+            top calc(var(--speed) * 1.2) var(--easing),
+            translate calc(var(--speed) * 1.2) var(--easing);
         }
         .comm-item .comm-icon {
+          position: absolute;
+          top: 50%;
+          right: 1.5rem;
+          translate: 0 -50%;
           width: 22px;
           height: 22px;
           color: #7DD8CD;
-          opacity: 0.78;
-          transition: opacity calc(var(--speed) * 1.2) var(--easing);
+          opacity: 0.8;
+          transition: opacity calc(var(--speed) * 1.2) var(--easing),
+            top calc(var(--speed) * 1.2) var(--easing);
         }
         .comm-item article p {
           font-family: var(--font-jetbrains), monospace;
           font-size: 13px;
-          line-height: 1.6;
+          line-height: 1.65;
           color: rgba(250, 250, 250, 0.86);
           text-wrap: balance;
           margin: 0;
-          max-width: 52ch;
+          max-width: 64ch;
           opacity: 0;
           transition: opacity calc(var(--speed) * 1.2) var(--easing);
         }
         .comm-item .comm-meta {
           display: flex;
-          gap: 0.4rem;
+          gap: 0.5rem;
           flex-wrap: wrap;
           opacity: 0;
           transition: opacity calc(var(--speed) * 1.2) var(--easing);
         }
         .comm-item .comm-cta {
           position: absolute;
-          bottom: 1rem;
+          bottom: 1.1rem;
+          right: 1.5rem;
           height: 22px;
           line-height: 1;
           color: #E0FF57;
@@ -269,23 +279,36 @@ export function CommunityAccordion() {
           opacity: 0;
           transition: opacity calc(var(--speed) * 1.2) var(--easing);
         }
-        .comm-item .comm-cta:is(:hover, :focus-visible) span {
+        .comm-item .comm-cta:is(:hover, :focus-visible) {
           text-decoration: underline;
           text-underline-offset: 4px;
         }
         .comm-item .comm-cta span {
-          display: inline-block;
-          line-height: 18px;
-          translate: calc(var(--base) * 0.5) 0;
           font-weight: 500;
         }
-        .comm-item[data-active="true"] h3,
+
+        /* Expanded row: title floats to top-left, icon to top-right,
+           body + meta reveal */
+        .comm-item[data-active="true"] article h3 {
+          top: 1.2rem;
+          translate: 0 0;
+          opacity: 1;
+        }
         .comm-item[data-active="true"] .comm-icon {
+          top: 1.2rem;
+          translate: 0 0;
           opacity: 1;
         }
         .comm-item[data-active="true"] :is(p, .comm-meta, .comm-cta) {
           opacity: 1;
           transition-delay: calc(var(--speed) * 0.25);
+        }
+
+        @media (max-width: 48em) {
+          .comm-grid {
+            min-height: clamp(520px, 90dvh, 880px);
+          }
+          .comm-item article h3 { font-size: 1.1rem; letter-spacing: 0.2em; }
         }
       `}</style>
     </section>

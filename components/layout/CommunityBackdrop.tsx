@@ -1,8 +1,10 @@
 "use client";
 
 /**
- * CommunityBackdrop — full-viewport iframe of the "ALIEN" particle pen,
- * recolored to gold + molten red. Sits behind the community page content.
+ * CommunityBackdrop — dimmed electric field behind the community page.
+ * Opacity held low + a heavy vignette so the particle strikes read as
+ * subtle ambient pulses rather than a full-intensity backdrop (fixes the
+ * perf/visual noise on /community).
  */
 export function CommunityBackdrop() {
   return (
@@ -15,15 +17,14 @@ export function CommunityBackdrop() {
         loading="lazy"
         allowTransparency
         className="absolute inset-0 h-full w-full"
-        style={{ border: 0, background: "transparent" }}
+        style={{ border: 0, background: "transparent", opacity: 0.28 }}
         title="Community electric backdrop"
       />
-      {/* Vignette to keep content legible on top */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)",
+            "radial-gradient(ellipse at center, transparent 18%, rgba(0,0,0,0.78) 100%)",
         }}
       />
     </div>
