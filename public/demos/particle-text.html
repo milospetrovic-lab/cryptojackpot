@@ -10,7 +10,7 @@
     margin: 0; padding: 0;
     width: 100%; height: 100%;
     overflow: hidden;
-    background: #0A0A0C;
+    background: transparent;
     font-family: "Cinzel", "Montserrat", serif;
   }
 </style>
@@ -19,13 +19,15 @@
 <script>
 /*
  * Adapted from Plasm.it "Particles Write Text" codepen.
- * Vanilla JS port, CryptoJackpot palette (gold + ruby on charcoal).
+ * Vanilla JS port, CryptoJackpot palette, transparent body.
+ * - body/canvas bg transparent (no dark box behind)
+ * - measureText-based sizing so the word always fits the viewport
+ * - destination-out trail fade preserves transparency
  */
 (() => {
   const TEXT = "CRYPTOJACKPOT";
-  const BG = "#0A0A0C";
   const particles = [];
-  const frequency = 20;
+  const frequency = 18;
 
   const winW = () => window.innerWidth;
   const winH = () => window.innerHeight;
@@ -34,8 +36,7 @@
     const canvas = document.createElement("canvas");
     canvas.width = w;
     canvas.height = h;
-    const context = canvas.getContext("2d");
-    return { canvas, context };
+    return { canvas, context: canvas.getContext("2d") };
   }
 
   let c1 = createCanvas(winW(), winH());
@@ -51,10 +52,17 @@
   });
   document.body.appendChild(c3.canvas);
 
+  // Fit text to available width — picks size so TEXT fills ~88% of iframe width.
   function writeText(cnvs, ctx, text) {
-    const size = Math.min(120, Math.max(56, Math.floor(winW() / 10)));
+    ctx.clearRect(0, 0, cnvs.width, cnvs.height);
+    const target = cnvs.width * 0.88;
+    let size = 100;
     ctx.font = `700 ${size}px "Cinzel", "Montserrat", serif`;
-    ctx.fillStyle = BG;
+    const baseW = ctx.measureText(text).width;
+    size = Math.min(220, Math.max(44, Math.floor((target / baseW) * size)));
+    ctx.font = `700 ${size}px "Cinzel", "Montserrat", serif`;
+    // Faint gold ghost — becomes invisible as particles paint over it.
+    ctx.fillStyle = "rgba(255, 215, 0, 0.18)";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     const lineheight = Math.floor(size * 0.95);
@@ -107,16 +115,17 @@
   }
 
   function popolate() {
-    particles.push(
-      new Particle(canvas, { x: winW() / 2, y: winH() / 2 })
-    );
+    particles.push(new Particle(canvas, { x: winW() / 2, y: winH() / 2 }));
   }
 
+  // Trail fade that preserves transparency — destination-out with low alpha.
   function clear() {
-    canvas.globalAlpha = 0.03;
-    canvas.fillStyle = BG;
+    canvas.globalCompositeOperation = "destination-out";
+    canvas.globalAlpha = 0.06;
+    canvas.fillStyle = "#000";
     canvas.fillRect(0, 0, tela.width, tela.height);
     canvas.globalAlpha = 1;
+    canvas.globalCompositeOperation = "source-over";
   }
 
   function maskCanvas() {
@@ -125,7 +134,7 @@
     c3.context.globalCompositeOperation = "source-atop";
     c3.context.drawImage(c1.canvas, 0, 0);
     c3.context.globalCompositeOperation = "source-over";
-    blur(c1.context, c1.canvas, 2);
+    blur(c1.context, c1.canvas, 1.4);
   }
 
   function update() {
@@ -139,13 +148,19 @@
 
   setInterval(popolate, frequency);
 
-  window.addEventListener("resize", () => {
+  function onResize() {
     const w = winW(), h = winH();
     [c1, c2, c3].forEach(({ canvas }) => {
       canvas.width = w; canvas.height = h;
     });
     writeText(c2.canvas, c2.context, TEXT);
-  });
+  }
+  window.addEventListener("resize", onResize);
+
+  // Web fonts load async — redraw once Cinzel is ready so the size is accurate.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => writeText(c2.canvas, c2.context, TEXT));
+  }
 
   update();
 })();

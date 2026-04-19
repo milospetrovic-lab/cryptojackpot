@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CryptoJackpot — Banner Particles</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: transparent;
+    font-family: "Montserrat", system-ui, sans-serif;
+  }
+  #particles-js {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    background: transparent;
+  }
+  .count-particles {
+    position: absolute;
+    right: 14px; bottom: 12px;
+    color: rgba(255, 215, 0, 0.55);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-family: "JetBrains Mono", "Courier New", monospace;
+    user-select: none;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<!-- particles.js container -->
+<div id="particles-js"></div>
+
+<!-- particle counter -->
+<div class="count-particles">
+  <span class="js-count-particles">--</span> particles
+</div>
+
+<!-- particles.js lib — Vincent Garreau -->
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script>
+  particlesJS("particles-js", {
+    particles: {
+      number: { value: 120, density: { enable: true, value_area: 900 } },
+      color: { value: ["#FFD700", "#D4AF37", "#C41E3A", "#E63946"] },
+      shape: {
+        type: "circle",
+        stroke: { width: 0, color: "#000" },
+      },
+      opacity: {
+        value: 0.7,
+        random: true,
+        anim: { enable: true, speed: 0.8, opacity_min: 0.15, sync: false },
+      },
+      size: {
+        value: 2.4,
+        random: true,
+        anim: { enable: true, speed: 2.2, size_min: 0.3, sync: false },
+      },
+      line_linked: {
+        enable: true,
+        distance: 130,
+        color: "#D4AF37",
+        opacity: 0.22,
+        width: 1,
+      },
+      move: {
+        enable: true,
+        speed: 1.6,
+        direction: "none",
+        random: true,
+        straight: false,
+        out_mode: "out",
+        bounce: false,
+      },
+    },
+    interactivity: {
+      detect_on: "canvas",
+      events: {
+        onhover: { enable: true, mode: "grab" },
+        onclick: { enable: true, mode: "push" },
+        resize: true,
+      },
+      modes: {
+        grab: { distance: 160, line_linked: { opacity: 0.7 } },
+        push: { particles_nb: 4 },
+      },
+    },
+    retina_detect: true,
+  });
+
+  // live particle count — hooks into particles.js internals
+  (function countUpdate() {
+    const el = document.querySelector(".js-count-particles");
+    function tick() {
+      if (window.pJSDom && window.pJSDom[0]) {
+        el.textContent = window.pJSDom[0].pJS.particles.array.length;
+      }
+      requestAnimationFrame(tick);
+    }
+    tick();
+  })();
+</script>
+</body>
+</html>

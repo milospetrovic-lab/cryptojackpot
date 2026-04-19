@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { cn } from "@/lib/utils";
 
@@ -7,15 +8,23 @@ type Props = { className?: string };
 
 export function MagnetoField({ className }: Props) {
   const { ref, inView } = useInView({ triggerOnce: true, rootMargin: "200px" });
-  const isMobile =
-    typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+  const [mobile, setMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const sync = () => setMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   return (
     <div ref={ref} className={cn("absolute inset-0", className)} aria-hidden>
-      {inView && !isMobile ? (
+      {inView && !mobile ? (
         <iframe
           src="/demos/magneto-field.html"
           loading="lazy"
+          allowTransparency
           className="absolute inset-0 h-full w-full"
           style={{ border: 0, background: "transparent" }}
           title="Magneto field"

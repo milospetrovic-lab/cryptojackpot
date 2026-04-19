@@ -9,7 +9,7 @@
     margin: 0; padding: 0;
     width: 100%; height: 100%;
     overflow: hidden;
-    background: #0A0A0C;
+    background: transparent;
   }
 </style>
 </head>
@@ -121,11 +121,14 @@
     return particles.length;
   }
 
+  // Trail fade that preserves transparency so the hero backdrop shows through.
   function clear() {
-    canvas.globalAlpha = 0.08;
-    canvas.fillStyle = BG;
+    canvas.globalCompositeOperation = "destination-out";
+    canvas.globalAlpha = 0.09;
+    canvas.fillStyle = "#000";
     canvas.fillRect(0, 0, tela.width, tela.height);
     canvas.globalAlpha = 1;
+    canvas.globalCompositeOperation = "source-over";
   }
 
   function update() {

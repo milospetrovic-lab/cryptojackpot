@@ -9,6 +9,7 @@ import { RollCall } from "@/components/jackpot/RollCall";
 import { FAQ } from "@/components/jackpot/FAQ";
 import { CommunitySection } from "@/components/jackpot/CommunitySection";
 import { ChipTier } from "@/components/jackpot/ChipTier";
+import { BannerCard } from "@/components/jackpot/BannerCard";
 import { TIERS } from "@/lib/tiers";
 
 export default function Home() {
@@ -18,23 +19,23 @@ export default function Home() {
 
       {/* HERO */}
       <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden">
-        {/* layer 1 — magneto attractor field (vanilla JS canvas iframe) */}
+        {/* layer 1 — magneto attractor field (transparent-bg iframe) */}
         <MagnetoField />
 
         {/* layer 2 — content */}
-        <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-6 pt-36 pb-20 text-center">
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-6 pt-36 pb-20 text-center">
           <div className="eyebrow mb-6">The Vulcan VIP Casino</div>
 
-          {/* Particle-written brand lockup — fills its own band behind the coin */}
-          <div className="relative mb-8 flex h-[clamp(200px,36vh,360px)] w-full items-center justify-center">
+          {/* Particle-written brand headline — generous band so the word fits */}
+          <div className="relative flex h-[clamp(220px,38vh,420px)] w-full items-center justify-center">
             <ParticleBrand />
           </div>
 
-          {/* Hero coin (transparent PNG from user) */}
+          {/* Hero coin — lifted ~80px so it tucks under the text */}
           <img
             src="/images/hero/center-coin-hero.png"
             alt="CryptoJackpot coin"
-            className="pointer-events-none mb-8 h-[clamp(120px,18vh,220px)] w-auto select-none object-contain drop-shadow-[0_0_60px_rgba(255,215,0,0.35)]"
+            className="pointer-events-none -mt-20 mb-6 h-[clamp(110px,16vh,190px)] w-auto select-none object-contain drop-shadow-[0_0_60px_rgba(255,215,0,0.4)]"
             draggable={false}
           />
 
@@ -75,6 +76,9 @@ export default function Home() {
           <VaultCounter variant="hero" />
         </div>
       </section>
+
+      {/* BANNER — particles.js + crypto 3D render */}
+      <BannerCard />
 
       {/* DROPS */}
       <DropsRow />
