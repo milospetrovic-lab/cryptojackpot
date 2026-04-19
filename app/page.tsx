@@ -24,9 +24,39 @@ export default function Home() {
         <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-6 pt-36 pb-20 text-center">
           <div className="eyebrow mb-4">The Vulcan VIP Casino</div>
 
-          <h1 className="display gold-text select-none text-center leading-[0.95] tracking-[0.08em] text-[clamp(3rem,10vw,7rem)]">
-            CRYPTOJACKPOT
-          </h1>
+          {(() => {
+            const WORD = "CRYPTOJACKPOT";
+            const PALETTE = [
+              "#E0FF57", // neon yellow
+              "#F68838", // orange
+              "#7DD8CD", // mint
+              "#F0FFA0", // pale yellow
+              "#E63946", // molten ruby
+            ];
+            return (
+              <h1
+                className="font-bebas select-none text-center leading-[0.95] tracking-[0.06em] text-[clamp(3rem,10vw,7rem)]"
+                aria-label={WORD}
+              >
+                {WORD.split("").map((ch, i) => {
+                  const color = PALETTE[i % PALETTE.length];
+                  return (
+                    <span
+                      key={i}
+                      aria-hidden
+                      style={{
+                        color,
+                        textShadow: `0 0 18px ${color}88, 0 0 36px ${color}44`,
+                        display: "inline-block",
+                      }}
+                    >
+                      {ch}
+                    </span>
+                  );
+                })}
+              </h1>
+            );
+          })()}
 
           <img
             src="/images/hero/center-coin-hero.png"

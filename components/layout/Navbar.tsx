@@ -10,7 +10,6 @@ import {
   Shield,
   Wallet,
 } from "lucide-react";
-import { LogoMark } from "@/components/layout/LogoMark";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -27,19 +26,22 @@ export function Navbar() {
 
   return (
     <>
-      {/* Top strip — centered logo only */}
+      {/* Top strip — centered coin logo + wordmark */}
       <header className="fixed inset-x-0 top-0 z-[150] flex justify-center px-3 pt-3">
-        <div className="rounded-2xl border border-jp-gold-deep/30 bg-black/65 px-6 py-2.5 backdrop-blur-xl">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-full border border-jp-gold-deep bg-gradient-to-b from-jp-gold-pale via-jp-gold to-jp-gold-deep font-display text-[13px] font-bold text-jp-obsidian tracking-[0.08em]">
-              CJ
-            </span>
-            <LogoMark width={180} height={26} className="hidden sm:inline-block" />
-            <span className="font-bebas text-[14px] text-jp-gold tracking-[0.32em] sm:hidden">
-              cryptojackpot
-            </span>
-          </Link>
-        </div>
+        <Link
+          href="/"
+          className="flex items-center gap-3 rounded-2xl border border-jp-gold-deep/30 bg-black/65 px-5 py-2 backdrop-blur-xl"
+        >
+          <img
+            src="/images/hero/center-coin-hero.png"
+            alt="CryptoJackpot"
+            className="h-9 w-9 select-none object-contain drop-shadow-[0_0_18px_rgba(224,255,87,0.35)] md:h-10 md:w-10"
+            draggable={false}
+          />
+          <span className="font-bebas text-[15px] tracking-[0.32em] text-jp-gold md:text-[16px]">
+            cryptojackpot
+          </span>
+        </Link>
       </header>
 
       {/* Bottom nav — primary browse surface, Deposit as a tab */}
