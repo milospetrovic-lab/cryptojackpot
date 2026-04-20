@@ -23,12 +23,13 @@ export function BannerCard() {
           minHeight: 340,
         }}
       >
-        {/* Layer 1 — banner image */}
+        {/* Layer 1 — banner image. Desktop keeps the original crypto-banner
+            render; mobile drops the image entirely (copy-only). */}
         <img
-          src="/images/banner/banner-mo.png"
+          src="/images/banner/crypto-banner.png"
           alt=""
           aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 hidden h-full w-full object-cover md:block"
         />
 
         {/* Layer 1.5 — gradient wash for contrast */}
