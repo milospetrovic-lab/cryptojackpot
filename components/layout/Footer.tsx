@@ -9,6 +9,7 @@ const LINKS = [
   { label: "Roll Call", href: "/leaderboard" },
   { label: "House Rules", href: "/responsible-play" },
   { label: "Concierge", href: "/support" },
+  { label: "Terms", href: "/terms" },
   { label: "About", href: "/about" },
 ];
 

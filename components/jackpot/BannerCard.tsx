@@ -14,11 +14,14 @@ export function BannerCard() {
   const { ref, inView } = useInView({ triggerOnce: true, rootMargin: "120px" });
 
   return (
-    <section className="relative mx-auto max-w-6xl px-6 py-14">
+    <section className="relative mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-14">
       <div
         ref={ref}
         className="relative overflow-hidden rounded-3xl border border-jp-gold-deep/30 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.9)]"
-        style={{ aspectRatio: "16 / 7", minHeight: 280 }}
+        style={{
+          aspectRatio: "16 / 9",
+          minHeight: 340,
+        }}
       >
         {/* Layer 1 — banner image */}
         <img
@@ -51,25 +54,25 @@ export function BannerCard() {
         )}
 
         {/* Layer 3 — copy */}
-        <div className="relative z-10 flex h-full flex-col justify-center px-8 py-10 md:px-14">
+        <div className="relative z-10 flex h-full flex-col justify-center px-5 py-8 md:px-14 md:py-10">
           <div className="eyebrow">The Vault Is Open</div>
-          <h2 className="display mt-3 max-w-xl text-jp-white tracking-[0.1em] leading-[0.95] text-[clamp(1.6rem,4.2vw,3.2rem)]">
+          <h2 className="display mt-3 max-w-xl text-jp-white tracking-[0.1em] leading-[0.95] text-[clamp(1.4rem,4.2vw,3.2rem)]">
             Every Spin <span className="gold-text">Feeds the Fire</span>
           </h2>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-jp-mute md:text-base">
+          <p className="mt-3 max-w-md text-[13px] leading-relaxed text-jp-mute md:mt-4 md:text-base">
             Stake in BTC, ETH, SOL, USDC. Drops auto-redeem. Play-through on
             the face. The Concierge is at the door.
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 md:mt-7">
             <Link
               href="/games"
-              className="rounded-full bg-gradient-to-b from-jp-gold-pale via-jp-gold to-jp-gold-deep px-7 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-jp-obsidian shadow-gold-glow"
+              className="inline-flex items-center justify-center rounded-full bg-gradient-to-b from-jp-gold-pale via-jp-gold to-jp-gold-deep px-6 py-3 text-[11px] font-bold uppercase tracking-[0.22em] text-jp-obsidian shadow-gold-glow sm:px-7 sm:tracking-[0.24em]"
             >
               Enter the Vault
             </Link>
             <Link
               href="/promotions"
-              className="rounded-full border border-jp-gold-deep/50 bg-black/40 px-7 py-3 text-[11px] font-bold uppercase tracking-[0.24em] text-jp-gold backdrop-blur hover:bg-black/60"
+              className="inline-flex items-center justify-center rounded-full border border-jp-gold-deep/50 bg-black/40 px-6 py-3 text-[11px] font-bold uppercase tracking-[0.22em] text-jp-gold backdrop-blur hover:bg-black/60 sm:px-7 sm:tracking-[0.24em]"
             >
               This Week's Drops
             </Link>

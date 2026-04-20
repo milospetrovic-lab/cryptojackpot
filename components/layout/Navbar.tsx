@@ -80,9 +80,9 @@ export function Navbar() {
         </button>
       </header>
 
-      {/* BOTTOM NAV — primary browse surface on desktop (kept on mobile too
-          so the Deposit CTA stays a single tap from any page) */}
-      <nav className="fixed inset-x-0 bottom-0 z-[150] flex justify-center px-3 pb-3">
+      {/* BOTTOM NAV — desktop/tablet only. Mobile relies on the burger
+          drawer alone (keeps the mobile viewport uncluttered). */}
+      <nav className="fixed inset-x-0 bottom-0 z-[150] hidden justify-center px-3 pb-3 md:flex">
         <div className="flex w-full max-w-5xl items-center gap-1 rounded-2xl border border-jp-gold-deep/35 bg-black/75 p-1.5 backdrop-blur-2xl shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.9)]">
           {NAV_LINKS.map((l) => {
             const Icon = l.icon;

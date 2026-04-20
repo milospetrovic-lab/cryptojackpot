@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { MagnetoField } from "@/components/three/MagnetoField";
 import { PromoBanner } from "@/components/jackpot/PromoBanner";
-import { DropsCarousel } from "@/components/jackpot/DropsCarousel";
+import { DropsAccordion } from "@/components/jackpot/DropsAccordion";
 import { RollCall } from "@/components/jackpot/RollCall";
 import { FAQ } from "@/components/jackpot/FAQ";
 import { CommunitySection } from "@/components/jackpot/CommunitySection";
@@ -75,8 +75,16 @@ export default function Home() {
       {/* BANNER — particles.js + crypto 3D render */}
       <BannerCard />
 
-      {/* DROPS — 3D carousel */}
-      <DropsCarousel />
+      {/* DROPS — same accordion pattern as /community */}
+      <section className="relative mx-auto max-w-6xl px-4 pt-6 md:px-6 md:pt-12">
+        <div className="mb-6 text-center md:mb-10">
+          <div className="eyebrow">Live This Week</div>
+          <h2 className="font-bebas mt-2 text-[clamp(2rem,5vw,3.8rem)] leading-[0.92] tracking-[0.04em] text-jp-white">
+            THE <span className="gold-text">DROPS</span>
+          </h2>
+        </div>
+        <DropsAccordion />
+      </section>
 
       {/* CROWN TIERS PREVIEW */}
       <section className="relative mx-auto max-w-6xl px-8 py-24">
