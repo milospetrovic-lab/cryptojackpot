@@ -141,7 +141,6 @@ export function DropsAccordion() {
               className="drops-item"
             >
               <article>
-                <img src={d.img} alt="" aria-hidden />
                 <h3>{d.title}</h3>
                 <Icon className="drops-icon" size={18} />
                 <div className="drops-meta">
@@ -303,21 +302,8 @@ export function DropsAccordion() {
         .drops-item .drops-cta span {
           font-weight: 500;
         }
-        .drops-item img {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          pointer-events: none;
-          filter: grayscale(0.6) brightness(0.85) saturate(0.9);
-          scale: 1.1;
-          transition-property: filter, scale;
-          transition-duration: calc(var(--speed) * 1.2);
-          transition-timing-function: var(--easing);
-          -webkit-mask: radial-gradient(100% 100% at 100% 0, #fff 40%, #0000 95%);
-          mask: radial-gradient(100% 100% at 100% 0, #fff 40%, #0000 95%);
-        }
+        /* (No card image — active-card backdrop is handled by the mint glow
+           and the container's own background.) */
         .drops-item[data-active="true"] h3,
         .drops-item[data-active="true"] .drops-icon {
           opacity: 1;
@@ -326,10 +312,8 @@ export function DropsAccordion() {
           opacity: 1;
           transition-delay: calc(var(--speed) * 0.25);
         }
-        .drops-item[data-active="true"] img {
-          filter: grayscale(0) brightness(1) saturate(1.1);
-          scale: 1;
-          transition-delay: calc(var(--speed) * 0.25);
+        .drops-item[data-active="true"] {
+          background: linear-gradient(135deg, rgba(125,216,205,0.07) 0%, rgba(224,255,87,0.04) 50%, transparent 100%), #0A0A0C;
         }
 
         /* Mobile — mirror the /community vertical accordion exactly.
@@ -381,10 +365,6 @@ export function DropsAccordion() {
           .drops-item[data-active="true"] .drops-icon {
             top: 1rem;
             translate: 0 0;
-          }
-          .drops-item img {
-            -webkit-mask: radial-gradient(130% 100% at 100% 100%, #fff 45%, #0000 95%);
-            mask: radial-gradient(130% 100% at 100% 100%, #fff 45%, #0000 95%);
           }
         }
       `}</style>
