@@ -95,13 +95,17 @@ export function DropsAccordion() {
       const closest = (target as HTMLElement | null)?.closest("li");
       if (!closest) return;
       const active = items.indexOf(closest);
-      const cols = items
+      const tracks = items
         .map((it, i) => {
           it.dataset.active = i === active ? "true" : "false";
-          return i === active ? "10fr" : "1fr";
+          return i === active ? "3.5fr" : "1fr";
         })
         .join(" ");
-      list.style.setProperty("grid-template-columns", cols);
+      // On mobile the grid stacks vertically (rows expand). On desktop the
+      // grid is horizontal (columns expand). Set both; only the active
+      // layout's template is used per the media query.
+      list.style.setProperty("grid-template-columns", tracks);
+      list.style.setProperty("grid-template-rows", tracks);
     };
 
     const onPointer = (e: PointerEvent) => setIndex(e.target);
@@ -171,7 +175,9 @@ export function DropsAccordion() {
           );
           container-type: inline-size;
           display: grid;
-          grid-template-columns: 10fr 1fr 1fr 1fr 1fr 1fr;
+          /* Desktop: horizontal — active column expands */
+          grid-template-columns: 3.5fr 1fr 1fr 1fr 1fr 1fr;
+          grid-template-rows: 1fr;
           gap: var(--gap);
           list-style: none;
           padding: 0;
@@ -179,12 +185,26 @@ export function DropsAccordion() {
           width: 100%;
           max-width: 1080px;
           height: clamp(320px, 52dvh, 500px);
-          transition: grid-template-columns var(--speed) var(--easing);
+          transition: grid-template-columns var(--speed) var(--easing),
+            grid-template-rows var(--speed) var(--easing);
+        }
+        @media (max-width: 48em) {
+          .drops-grid {
+            /* Mobile: vertical stack — active row expands. Fits the narrow
+               viewport without horizontal overflow. */
+            --base: 52px;
+            grid-template-columns: 1fr;
+            grid-template-rows: 3fr 1fr 1fr 1fr 1fr 1fr;
+            height: auto;
+            min-height: clamp(440px, 64dvh, 620px);
+            max-width: 100%;
+          }
         }
         .drops-item {
           position: relative;
           overflow: hidden;
           min-width: var(--base);
+          min-height: var(--base);
           border-radius: 14px;
           border: 1px solid rgba(184, 220, 74, 0.25);
           background: #0A0A0C;
@@ -305,6 +325,64 @@ export function DropsAccordion() {
           filter: grayscale(0) brightness(1) saturate(1.1);
           scale: 1;
           transition-delay: calc(var(--speed) * 0.25);
+        }
+
+        /* Mobile-specific overrides — title sits horizontally at the top
+           of each row, body/meta/CTA flow naturally, no rotation. */
+        @media (max-width: 48em) {
+          .drops-item article {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 1rem;
+            justify-content: flex-end;
+          }
+          .drops-item article h3 {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            translate: 0 -50%;
+            rotate: 0deg;
+            font-size: 0.95rem;
+            letter-spacing: 0.2em;
+            transition: top calc(var(--speed) * 1.2) var(--easing),
+              translate calc(var(--speed) * 1.2) var(--easing),
+              opacity calc(var(--speed) * 1.2) var(--easing);
+          }
+          .drops-item .drops-icon {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            translate: 0 -50%;
+            transition: top calc(var(--speed) * 1.2) var(--easing),
+              translate calc(var(--speed) * 1.2) var(--easing),
+              opacity calc(var(--speed) * 1.2) var(--easing);
+          }
+          .drops-item article p {
+            font-size: 11.5px;
+            max-width: none;
+            line-height: 1.45;
+            padding-top: 2rem;
+          }
+          .drops-item[data-active="true"] article h3 {
+            top: 1rem;
+            translate: 0 0;
+          }
+          .drops-item[data-active="true"] .drops-icon {
+            top: 1rem;
+            translate: 0 0;
+          }
+          .drops-item .drops-cta {
+            position: absolute;
+            bottom: 0.8rem;
+            right: 1rem;
+            height: 18px;
+          }
+          .drops-item .drops-cta span {
+            translate: 0 0;
+          }
+          .drops-item img {
+            -webkit-mask: radial-gradient(120% 100% at 100% 100%, #fff 50%, #0000 95%);
+            mask: radial-gradient(120% 100% at 100% 100%, #fff 50%, #0000 95%);
+          }
         }
       `}</style>
     </section>

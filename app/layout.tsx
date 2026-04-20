@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cinzel, Manrope, JetBrains_Mono, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import { Preloader } from "@/components/layout/Preloader";
@@ -34,6 +34,15 @@ const bebas = Bebas_Neue({
   variable: "--font-bebas",
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Prevent horizontal pan / unintentional pinch-zoom beyond 1× that was
+  // exposing overflow on mobile. The user can still double-tap to zoom.
+  maximumScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: "cryptojackpot — where the molten meets the jackpot.",
