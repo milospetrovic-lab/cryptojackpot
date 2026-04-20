@@ -25,7 +25,7 @@ export function BannerCard() {
       >
         {/* Layer 1 — banner image */}
         <img
-          src="/images/banner/crypto-banner.png"
+          src="/images/banner/banner-mo.png"
           alt=""
           aria-hidden
           className="absolute inset-0 h-full w-full object-cover"

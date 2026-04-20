@@ -220,16 +220,16 @@ export function DropsAccordion() {
             0 24px 60px -30px rgba(0, 0, 0, 0.9);
         }
         .drops-item article {
-          width: calc(var(--article-width, 760) * 1px);
           height: 100%;
           position: absolute;
           inset: 0;
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
-          gap: 0.9rem;
-          padding-inline: calc(var(--base) * 0.5 - 9px);
-          padding-bottom: 1.1rem;
+          gap: 0.7rem;
+          /* Leave a gutter on the LEFT for the rotated title column so the
+             body copy on the active card never overlaps the h3. */
+          padding: 1rem 1.25rem 1rem calc(var(--base) + 0.25rem);
           overflow: hidden;
         }
         .drops-item article h3 {
@@ -246,10 +246,14 @@ export function DropsAccordion() {
           text-transform: uppercase;
           color: #F0FFA0;
           white-space: nowrap;
-          opacity: 0.68;
+          opacity: 0.72;
           transition: opacity calc(var(--speed) * 1.2) var(--easing);
         }
         .drops-item .drops-icon {
+          position: absolute;
+          left: calc(var(--base) * 0.5);
+          bottom: 1rem;
+          translate: -50% 0;
           width: 18px;
           height: 18px;
           color: #7DD8CD;
@@ -259,11 +263,11 @@ export function DropsAccordion() {
         .drops-item article p {
           font-family: var(--font-jetbrains), monospace;
           font-size: 12.5px;
-          line-height: 1.5;
+          line-height: 1.55;
           color: rgba(250, 250, 250, 0.82);
           text-wrap: balance;
           margin: 0;
-          max-width: 48ch;
+          max-width: 50ch;
           opacity: 0;
           transition: opacity calc(var(--speed) * 1.2) var(--easing);
         }
@@ -275,27 +279,28 @@ export function DropsAccordion() {
           transition: opacity calc(var(--speed) * 1.2) var(--easing);
         }
         .drops-item .drops-cta {
-          position: absolute;
-          bottom: 1rem;
-          height: 22px;
-          line-height: 1;
+          display: inline-flex;
+          align-items: center;
+          width: fit-content;
           color: #E0FF57;
           font-family: var(--font-jetbrains), monospace;
           font-size: 11px;
           letter-spacing: 0.18em;
           text-transform: uppercase;
           text-decoration: none;
+          padding: 0.4rem 0.9rem;
+          border-radius: 999px;
+          border: 1px solid rgba(224, 255, 87, 0.5);
+          background: rgba(224, 255, 87, 0.08);
           opacity: 0;
-          transition: opacity calc(var(--speed) * 1.2) var(--easing);
+          transition: opacity calc(var(--speed) * 1.2) var(--easing),
+            background 0.25s ease, border-color 0.25s ease;
         }
-        .drops-item .drops-cta:is(:hover, :focus-visible) span {
-          text-decoration: underline;
-          text-underline-offset: 4px;
+        .drops-item .drops-cta:is(:hover, :focus-visible) {
+          background: rgba(224, 255, 87, 0.18);
+          border-color: #E0FF57;
         }
         .drops-item .drops-cta span {
-          display: inline-block;
-          line-height: 18px;
-          translate: calc(var(--base) * 0.5) 0;
           font-weight: 500;
         }
         .drops-item img {
@@ -327,20 +332,22 @@ export function DropsAccordion() {
           transition-delay: calc(var(--speed) * 0.25);
         }
 
-        /* Mobile-specific overrides — title sits horizontally at the top
-           of each row, body/meta/CTA flow naturally, no rotation. */
+        /* Mobile — mirror the /community vertical accordion exactly.
+           Horizontal title + icon on each row, active row expands. */
         @media (max-width: 48em) {
           .drops-item article {
             width: 100%;
-            padding: 0.9rem 1rem 0.9rem 1rem;
+            padding: 0.9rem 1.1rem 1rem 1.1rem;
             justify-content: flex-end;
+            gap: 0.7rem;
           }
           .drops-item article h3 {
             position: absolute;
             top: 50%;
-            left: 1rem;
+            left: 1.1rem;
             translate: 0 -50%;
             rotate: 0deg;
+            transform-origin: center;
             font-size: 0.95rem;
             letter-spacing: 0.2em;
             transition: top calc(var(--speed) * 1.2) var(--easing),
@@ -350,17 +357,22 @@ export function DropsAccordion() {
           .drops-item .drops-icon {
             position: absolute;
             top: 50%;
-            right: 1rem;
+            right: 1.1rem;
+            bottom: auto;
+            left: auto;
             translate: 0 -50%;
             transition: top calc(var(--speed) * 1.2) var(--easing),
               translate calc(var(--speed) * 1.2) var(--easing),
               opacity calc(var(--speed) * 1.2) var(--easing);
           }
           .drops-item article p {
-            font-size: 11.5px;
+            font-size: 12px;
             max-width: none;
-            line-height: 1.45;
-            padding-top: 2rem;
+            line-height: 1.5;
+          }
+          .drops-item[data-active="true"] article {
+            padding-top: 2.6rem;
+            padding-bottom: 1rem;
           }
           .drops-item[data-active="true"] article h3 {
             top: 1rem;
@@ -370,18 +382,9 @@ export function DropsAccordion() {
             top: 1rem;
             translate: 0 0;
           }
-          .drops-item .drops-cta {
-            position: absolute;
-            bottom: 0.8rem;
-            right: 1rem;
-            height: 18px;
-          }
-          .drops-item .drops-cta span {
-            translate: 0 0;
-          }
           .drops-item img {
-            -webkit-mask: radial-gradient(120% 100% at 100% 100%, #fff 50%, #0000 95%);
-            mask: radial-gradient(120% 100% at 100% 100%, #fff 50%, #0000 95%);
+            -webkit-mask: radial-gradient(130% 100% at 100% 100%, #fff 45%, #0000 95%);
+            mask: radial-gradient(130% 100% at 100% 100%, #fff 45%, #0000 95%);
           }
         }
       `}</style>
